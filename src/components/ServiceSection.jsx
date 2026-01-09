@@ -91,7 +91,7 @@ const ServiceSection = () => {
   ];
 
   return (
-    <div className="relative overflow-hidden py-10 lg:py-32">
+    <div className="relative overflow-hidden py-10 lg:py-12">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-50 via-white to-gray-50" />
       
@@ -227,14 +227,7 @@ const ServiceSection = () => {
           </div>
 
           <div className="relative py-12 px-8 lg:px-16">
-            <div className="text-center mb-10">
-              <h3 className="text-3xl font-bold text-white mb-4">
-                Why Customers Love Us
-              </h3>
-              <p className="text-white/80 max-w-2xl mx-auto">
-                Join thousands of satisfied customers who trust us with their smartphone needs
-              </p>
-            </div>
+           
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
               {highlights.map((highlight, index) => (
@@ -254,15 +247,7 @@ const ServiceSection = () => {
               ))}
             </div>
 
-            {/* CTA */}
-            <div className="text-center mt-12">
-              <button className="inline-flex items-center gap-3 px-8 py-4 bg-white text-gray-900 rounded-full font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-                <span>Explore All Services</span>
-                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">→</span>
-                </div>
-              </button>
-            </div>
+            
           </div>
 
           {/* Floating Elements */}

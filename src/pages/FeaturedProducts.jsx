@@ -88,7 +88,7 @@ const FeaturedProducts = () => {
  
 
   return (
-    <div className="relative overflow-hidden py-3 lg:py-32">
+    <div className="relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-white via-gray-50/50 to-white" />
       
@@ -196,9 +196,7 @@ const FeaturedProducts = () => {
                 Shop by Category
               </h3>
             </div>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Find exactly what you need with our carefully curated categories
-            </p>
+          
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -265,14 +263,7 @@ const FeaturedProducts = () => {
 
         {/* Featured Brands */}
         <div className="mt-24">
-          <div className="text-center mb-12">
-            <h4 className="text-2xl font-bold text-gray-900 mb-4">
-              Trusted by Leading Brands
-            </h4>
-            <p className="text-gray-600">
-              Official partners with top smartphone manufacturers
-            </p>
-          </div>
+          
 
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
             {['Apple', 'Samsung', 'Google', 'OnePlus', 'Xiaomi', 'Nothing'].map((brand, index) => (
