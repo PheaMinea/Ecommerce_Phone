@@ -5,107 +5,131 @@ export const products = [
     name: "iPhone 15 Pro",
     brand: "Apple",
     price: 999,
+    originalPrice: 1199,
     image: "https://i.pinimg.com/736x/1a/76/26/1a7626d44c15f3c572ed6399e27ead0d.jpg",
-    description: "Titanium powerhouse with revolutionary A17 Pro chip and pro camera.",
+    description: "Titanium design with A17 Pro chip and professional camera system.",
     specs: {
       screen: "6.1-inch Super Retina XDR",
       processor: "A17 Pro",
       ram: "8GB",
       storage: "128GB",
       battery: "3274 mAh",
-      camera: "48MP + 12MP + 12MP"
+      camera: "48MP + 12MP + 12MP",
+      os: "iOS 17"
     },
     colors: ["Black Titanium", "White Titanium", "Natural Titanium", "Blue Titanium"],
-    category: "flagship"
+    category: "flagship",
+    rating: 4.8,
+    reviewCount: 1243
   },
   {
     id: 2,
     name: "Galaxy S24 Ultra",
     brand: "Samsung",
     price: 1299,
+    originalPrice: 1399,
     image: "https://i.pinimg.com/1200x/5b/d8/93/5bd893c5ec4277bc4cff54fbb3e79afb.jpg",
-    description: "AI-powered beast with built-in S Pen and 200MP camera.",
+    description: "AI-powered smartphone with built-in S Pen and 200MP camera.",
     specs: {
       screen: "6.8-inch Dynamic AMOLED 2X",
       processor: "Snapdragon 8 Gen 3",
       ram: "12GB",
       storage: "256GB",
       battery: "5000 mAh",
-      camera: "200MP + 12MP + 50MP + 10MP"
+      camera: "200MP + 12MP + 50MP + 10MP",
+      os: "Android 14"
     },
-    colors: ["Phantom Black", "Gray", "Violet", "Yellow"],
-    category: "flagship"
+    colors: ["Phantom Black", "Phantom White", "Graphite", "Lavender"],
+    category: "flagship",
+    rating: 4.7,
+    reviewCount: 987
   },
   {
     id: 3,
     name: "Pixel 8 Pro",
     brand: "Google",
     price: 899,
+    originalPrice: 999,
     image: "https://i.pinimg.com/1200x/7f/94/6a/7f946ad8484f77e08529409b430a9afb.jpg",
-    description: "AI photography master with 7 years of software updates.",
+    description: "AI photography smartphone with 7 years of software updates.",
     specs: {
       screen: "6.7-inch LTPO OLED",
       processor: "Tensor G3",
       ram: "12GB",
       storage: "128GB",
       battery: "5050 mAh",
-      camera: "50MP + 48MP + 48MP"
+      camera: "50MP + 48MP + 48MP",
+      os: "Android 14"
     },
-    colors: ["Obsidian", "Porcelain", "Bay"],
-    category: "flagship"
+    colors: ["Obsidian", "Porcelain", "Bay", "Hazel"],
+    category: "flagship",
+    rating: 4.6,
+    reviewCount: 856
   },
   {
     id: 4,
     name: "OnePlus 12",
     brand: "OnePlus",
     price: 799,
+    originalPrice: 899,
     image: "https://i.pinimg.com/736x/8b/0a/ff/8b0affab4dc57570bf6c3e717684332d.jpg",
-    description: "Speed demon with 100W charging and Hasselblad camera.",
+    description: "Fast charging smartphone with Hasselblad camera system.",
     specs: {
       screen: "6.82-inch LTPO AMOLED",
       processor: "Snapdragon 8 Gen 3",
       ram: "12GB",
       storage: "256GB",
       battery: "5400 mAh",
-      camera: "50MP + 48MP + 64MP"
+      camera: "50MP + 48MP + 64MP",
+      os: "Android 14"
     },
     colors: ["Black", "Green", "White"],
-    category: "mid-range"
+    category: "mid-range",
+    rating: 4.5,
+    reviewCount: 723
   },
   {
     id: 5,
     name: "Xiaomi 14 Pro",
     brand: "Xiaomi",
     price: 899,
+    originalPrice: 999,
     image: "https://i.pinimg.com/1200x/af/f1/43/aff143262a0689ffe2957303366ac190.jpg",
-    description: "Leica co-engineered camera with cutting-edge HyperOS.",
+    description: "Leica co-engineered camera with HyperOS.",
     specs: {
       screen: "6.73-inch LTPO AMOLED",
       processor: "Snapdragon 8 Gen 3",
       ram: "12GB",
       storage: "256GB",
       battery: "4880 mAh",
-      camera: "50MP + 50MP + 50MP"
+      camera: "50MP + 50MP + 50MP",
+      os: "HyperOS"
     },
     colors: ["Black", "White", "Green"],
-    category: "flagship"
+    category: "flagship",
+    rating: 4.4,
+    reviewCount: 654
   },
   {
     id: 6,
     name: "Nothing Phone 2",
     brand: "Nothing",
     price: 699,
+    originalPrice: 799,
     image: "https://i.pinimg.com/736x/58/04/34/5804349542dc0fede146a1f90c6c9e28.jpg",
-    description: "Iconic transparent design with unique Glyph Interface.",
+    description: "Unique transparent design with Glyph Interface.",
     specs: {
       screen: "6.7-inch LTPO OLED",
       processor: "Snapdragon 8+ Gen 1",
       ram: "8GB",
       storage: "128GB",
       battery: "4700 mAh",
-      camera: "50MP + 50MP"
+      camera: "50MP + 50MP",
+      os: "Android 14"
     },
     colors: ["White", "Gray"],
-    category: "mid-range"
+    category: "mid-range",
+    rating: 4.3,
+    reviewCount: 589
   }
 ];
