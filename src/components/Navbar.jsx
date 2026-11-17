@@ -1,201 +1,318 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  Heart,
+  Menu,
+  Search,
+  ShoppingBag,
+  Truck,
+  UserRound,
+  X,
+} from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useShop } from "../context/ShopContext";
-import { Search, ShoppingBag, User, Menu, X, Smartphone } from "lucide-react";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import SearchBar from "./SearchBar";
 
-const Navbar = () => {
-  const { cartCount } = useShop();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+const navLinks = [
+  { to: "/products", label: "Shop all" },
+  { to: "/products?category=flagship", label: "Flagships" },
+  { to: "/products?category=foldable", label: "Foldables" },
+  { to: "/products?deals=1", label: "Deals" },
+];
+
+const drawerGroups = [
+  {
+    title: "Shop",
+    links: [
+      { to: "/products", label: "All devices" },
+      { to: "/products?category=flagship", label: "Flagships" },
+      { to: "/products?category=foldable", label: "Foldables" },
+      { to: "/products?category=camera", label: "Camera-first" },
+      { to: "/products?category=value", label: "Best value" },
+      { to: "/products?category=audio", label: "Audio" },
+      { to: "/products?category=accessories", label: "Accessories" },
+      { to: "/products?deals=1", label: "Deals" },
+    ],
+  },
+  {
+    title: "Account",
+    links: [
+      { to: "/profile", label: "My profile" },
+      { to: "/profile?tab=orders", label: "Orders" },
+      { to: "/profile?tab=wishlist", label: "Saved items" },
+      { to: "/login", label: "Sign in" },
+    ],
+  },
+];
+
+function Logo({ onClick }) {
+  return (
+    <Link
+      to="/"
+      onClick={onClick}
+      className="flex shrink-0 items-center"
+      aria-label="NORTH — home"
+    >
+      <span className="font-display text-[22px] font-bold leading-none tracking-[-0.05em] text-ink">
+        NORTH<span className="text-blue">.</span>
+      </span>
+    </Link>
+  );
+}
+
+export default function Navbar() {
+  const { cartCount, wishlist } = useCart();
+  const { user } = useAuth();
   const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  const closeOverlays = () => {
+    setMenuOpen(false);
+    setSearchOpen(false);
+  };
+
+  const isActive = (to) => {
+    if (to === "/") return location.pathname === "/";
+    const [path, search] = to.split("?");
+    if (location.pathname !== path) return false;
+    const currentParams = new URLSearchParams(location.search);
+    if (!search) return [...currentParams.keys()].length === 0;
+    const wanted = new URLSearchParams(search);
+    return [...wanted.entries()].every(([key, value]) => currentParams.get(key) === value);
+  };
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    const onKey = (event) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        setSearchOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const navItems = [
-    { path: "/", label: "Home" },
-    { path: "/products", label: "Products" },
-    { path: "/deals", label: "Deals" },
-    { path: "/about", label: "About" },
-    { path: "/contact", label: "Contact" },
-  ];
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((part) => part[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : "";
 
   return (
     <>
-      {/* Top Announcement Bar */}
-      <div className="bg-blue-600 text-white py-2 text-center text-sm">
-        <div className="container mx-auto px-4">
-          <span className="font-medium">S26 Series Pre-Orders Now Open</span>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-navy focus:shadow-lg"
+      >
+        Skip to content
+      </a>
+
+      {/* Announcement */}
+      <div className="border-b border-line bg-ice">
+        <div className="wrap flex h-9 items-center justify-between gap-4">
+          <p className="flex items-center gap-2 text-[11px] font-medium text-muted">
+            <Truck size={12} className="text-blue" aria-hidden="true" />
+            Free next-day delivery over $999
+          </p>
+          <p className="hidden text-[11px] text-muted md:block">
+            30-day returns · 24-month warranty · Trade-in credit on every flagship
+          </p>
+          <a
+            href="tel:+442079460321"
+            className="hidden text-[11px] font-medium text-muted transition-colors hover:text-ink sm:block"
+          >
+            Help · +44 20 7946 0321
+          </a>
         </div>
       </div>
 
-      {/* Main Navigation */}
-      <nav className={`sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? "bg-white shadow-md" 
-          : "bg-white"
-      }`}>
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
-              <Smartphone className="w-6 h-6 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">
-                Core<span className="text-blue-600">Hub</span>
-              </span>
-            </Link>
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-line bg-white/95 backdrop-blur-md">
+        <div className="wrap relative flex h-16 items-center gap-3">
+          <Logo onClick={closeOverlays} />
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-6">
-              {navItems.map((item) => (
-                <Link 
-                  key={item.label}
-                  to={item.path}
-                  className={`font-medium transition-colors ${
-                    location.pathname === item.path 
-                      ? "text-blue-600" 
-                      : "text-gray-700 hover:text-blue-600"
+          <nav
+            aria-label="Primary"
+            className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 lg:flex"
+          >
+            {navLinks.map((link) => {
+              const active = isActive(link.to);
+              return (
+                <Link
+                  key={link.label}
+                  to={link.to}
+                  onClick={closeOverlays}
+                  aria-current={active ? "page" : undefined}
+                  className={`relative py-1 text-sm transition-colors ${
+                    active ? "font-medium text-ink" : "font-normal text-muted hover:text-ink"
                   }`}
                 >
-                  {item.label}
+                  {link.label}
+                  {active && (
+                    <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-blue" />
+                  )}
                 </Link>
-              ))}
-            </div>
+              );
+            })}
+          </nav>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={() => setIsSearchOpen(true)}
-                className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
-                aria-label="Search"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-              
-              <Link 
-                to="/cart" 
-                className="p-2 text-gray-600 hover:text-blue-600 transition-colors relative"
-                aria-label="Shopping Cart"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-xs font-bold text-white rounded-full flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-
-              <Link 
-                to="/account" 
-                className="hidden sm:block p-2 text-gray-600 hover:text-blue-600 transition-colors"
-                aria-label="Account"
-              >
-                <User className="w-5 h-5" />
-              </Link>
-
-              <button 
-                onClick={() => setIsMenuOpen(true)}
-                className="md:hidden p-2 text-gray-600 hover:text-blue-600 transition-colors"
-                aria-label="Menu"
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Mobile Menu */}
-      <div className={`fixed inset-0 z-[100] md:hidden ${isMenuOpen ? "block" : "hidden"}`}>
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm" 
-          onClick={() => setIsMenuOpen(false)} 
-        />
-        <div className="fixed right-0 top-0 bottom-0 w-64 bg-white shadow-xl p-6 transform transition-transform duration-300 ease-in-out">
-          <div className="flex justify-between items-center mb-8">
-            <Link to="/" className="flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
-              <Smartphone className="w-6 h-6 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">CoreHub</span>
-            </Link>
-            <button 
-              onClick={() => setIsMenuOpen(false)}
-              className="p-2 text-gray-600 hover:text-gray-900"
+          <div className="ml-auto flex items-center gap-0.5">
+            <button
+              type="button"
+              onClick={() => setSearchOpen((open) => !open)}
+              aria-expanded={searchOpen}
+              aria-label={searchOpen ? "Close search" : "Open search"}
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-ink transition-colors hover:bg-ice"
             >
-              <X className="w-6 h-6" />
+              {searchOpen ? (
+                <X size={19} aria-hidden="true" />
+              ) : (
+                <Search size={19} aria-hidden="true" />
+              )}
+            </button>
+
+            <Link
+              to="/profile?tab=wishlist"
+              onClick={closeOverlays}
+              aria-label={`Saved items${wishlist.length ? `, ${wishlist.length}` : ""}`}
+              className="relative flex h-11 w-11 items-center justify-center rounded-lg text-ink transition-colors hover:bg-ice"
+            >
+              <Heart size={19} aria-hidden="true" />
+              {wishlist.length > 0 && (
+                <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-sale px-1 font-mono text-[9px] font-semibold text-white">
+                  {wishlist.length}
+                </span>
+              )}
+            </Link>
+
+            <Link
+              to={user ? "/profile" : "/login"}
+              onClick={closeOverlays}
+              aria-label={user ? `Account — ${user.name}` : "Sign in"}
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-ink transition-colors hover:bg-ice"
+            >
+              {user ? (
+                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-ice text-[10px] font-semibold text-ink">
+                  {initials}
+                </span>
+              ) : (
+                <UserRound size={19} aria-hidden="true" />
+              )}
+            </Link>
+
+            <Link
+              to="/cart"
+              onClick={closeOverlays}
+              aria-label={`Shopping bag, ${cartCount} ${cartCount === 1 ? "item" : "items"}`}
+              className="relative flex h-11 w-11 items-center justify-center rounded-lg text-ink transition-colors hover:bg-ice"
+            >
+              <ShoppingBag size={19} aria-hidden="true" />
+              {cartCount > 0 && (
+                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue px-1 font-mono text-[9px] font-semibold text-white">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={menuOpen}
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-ink transition-colors hover:bg-ice lg:hidden"
+            >
+              <Menu size={21} aria-hidden="true" />
             </button>
           </div>
-          
-          <div className="space-y-4">
-            {navItems.map((item) => (
-              <Link 
-                key={item.label}
-                to={item.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={`block py-3 px-4 rounded-lg font-medium ${
-                  location.pathname === item.path 
-                    ? "bg-blue-50 text-blue-600" 
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-          
-          <div className="absolute bottom-6 left-6 right-6">
-            <Link 
-              to="/account" 
-              className="block py-3 text-center text-gray-700 hover:text-blue-600 border-t border-gray-100 pt-4"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              My Account
-            </Link>
-          </div>
         </div>
-      </div>
 
-      {/* Search Modal */}
-      <div className={`fixed inset-0 z-[110] ${isSearchOpen ? "block" : "hidden"}`}>
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm" 
-          onClick={() => setIsSearchOpen(false)} 
-        />
-        <div className="fixed inset-0 flex items-start justify-center pt-20">
-          <div className="w-full max-w-2xl mx-4">
-            <div className="relative">
-              <input 
-                type="text"
-                placeholder="Search products..." 
-                className="w-full bg-white rounded-lg py-4 px-6 text-gray-900 text-lg shadow-xl outline-none border border-gray-200"
-                autoFocus={isSearchOpen}
+        {searchOpen && (
+          <div className="border-t border-line bg-white py-3">
+            <div className="wrap"><div className="mx-auto max-w-2xl">
+              <SearchBar
+                variant="large"
+                onSearchComplete={() => setSearchOpen(false)}
               />
-              <button 
-                onClick={() => setIsSearchOpen(false)}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            </div></div>
+          </div>
+        )}
+      </header>
+
+      {/* Mobile drawer */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-[80] lg:hidden">
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={() => setMenuOpen(false)}
+            className="absolute inset-0 h-full w-full cursor-default bg-ink/25 backdrop-blur-[2px] animate-fade"
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
+            className="animate-slide-right absolute inset-y-0 left-0 flex w-[88%] max-w-[350px] flex-col bg-white shadow-2xl"
+          >
+            <div className="flex items-center justify-between border-b border-line px-5 py-4">
+              <Logo onClick={() => setMenuOpen(false)} />
+              <button
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Close menu"
+                className="flex h-11 w-11 items-center justify-center rounded-lg text-navy hover:bg-ice"
               >
-                <X className="w-6 h-6" />
+                <X size={20} aria-hidden="true" />
               </button>
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {['iPhone', 'Samsung', 'Accessories', 'Tablets'].map(tag => (
-                <button 
-                  key={tag} 
-                  className="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm hover:bg-gray-200 transition-colors"
-                >
-                  {tag}
-                </button>
-              ))}
+
+            <div className="flex-1 overflow-y-auto px-5 py-5">
+              <SearchBar variant="large" onSearchComplete={() => setMenuOpen(false)} />
+
+              <div className="mt-6 space-y-6">
+                {drawerGroups.map((group) => (
+                  <div key={group.title}>
+                    <p className="eyebrow text-muted">{group.title}</p>
+                    <ul className="mt-2 divide-y divide-line border-y border-line">
+                      {group.links.map((link) => (
+                        <li key={link.label}>
+                          <Link
+                            to={link.to}
+                            onClick={() => setMenuOpen(false)}
+                            className="flex items-center justify-between py-3 text-sm font-medium text-ink transition-colors hover:text-blue"
+                          >
+                            {link.label}
+                            <span className="font-mono text-xs text-muted">→</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-line bg-ice px-5 py-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+                North Device Store
+              </p>
+              <p className="mt-1 text-xs text-muted">
+                Free next-day delivery over $999 · 30-day returns
+              </p>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
-};
-
-export default Navbar;
+}

@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(mkdir -p .shots)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --window-size=1440,1600 --screenshot=.shots/current-home.png \"http://localhost:5174/\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --window-size=1440,1800 --screenshot=\"D:/book/ស្នាដៃរបស់ខ្ញុំ/Frontend/Pro_2/Ecommerceiphone/.shots/current-home.png\" \"http://localhost:5174/\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{time_total}s\\\\n\" --max-time 15 \"https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1000&q=80\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --window-size=1440,1800 --virtual-time-budget=10000 --screenshot=\"D:/book/ស្នាដៃរបស់ខ្ញុំ/Frontend/Pro_2/Ecommerceiphone/.shots/current-home.png\" \"http://localhost:5174/\")",
+      "Bash(done)",
+      "Bash(wc -l src/*.jsx src/*.css src/components/*.jsx src/pages/*.jsx src/context/*.jsx src/data/*.js)",
+      "Bash(npm -v)",
+      "Bash(rm -f src/App.css src/components/*.jsx src/pages/*.jsx src/context/*.jsx src/data/*.js src/assets/react.svg)",
+      "Bash(mkdir -p src/components src/pages src/context src/data src/utils)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --window-size=1440,3200 --virtual-time-budget=8000 --screenshot=\"D:/book/ស្នាដៃរបស់ខ្ញុំ/Frontend/Pro_2/Ecommerceiphone/.shots/north-home.png\" \"http://localhost:5175/\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --window-size=1440,1900 --virtual-time-budget=6000 --screenshot=\"D:/book/ស្នាដៃរបស់ខ្ញុំ/Frontend/Pro_2/Ecommerceiphone/.shots/home-top.png\" \"http://localhost:5175/\")",
+      "Bash(python -:*)",
+      "Bash('CHROME=/c/Program Files/Google/Chrome/Application/chrome.exe')",
+      "Bash($CHROME --headless=new --disable-gpu --hide-scrollbars --window-size=1440,1900 --virtual-time-budget=5000 --screenshot=.shots/home-top2.png http://localhost:5175/)",
+      "Bash($CHROME --headless=new --disable-gpu --hide-scrollbars --window-size=1440,1700 --virtual-time-budget=5000 --screenshot=.shots/products.png http://localhost:5175/products)",
+      "Bash($CHROME --headless=new --disable-gpu --hide-scrollbars --window-size=1440,1900 --virtual-time-budget=5000 --screenshot=.shots/details.png http://localhost:5175/product/iphone-17-pro-max)",
+      "Bash($CHROME --headless=new --disable-gpu --hide-scrollbars --window-size=1440,1500 --virtual-time-budget=5000 --screenshot=.shots/login.png http://localhost:5175/login)",
+      "Bash(node -e \":*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5175/)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --window-size=1440,1900 --virtual-time-budget=6000 --screenshot=\"D:/book/ស្នាដៃរបស់ខ្ញុំ/Frontend/Pro_2/Ecommerceiphone/.shots/new-home.png\" \"http://localhost:5175/\")"
+    ]
+  }
+}

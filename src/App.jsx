@@ -1,47 +1,70 @@
-// src/App.js
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ShopProvider } from "./context/ShopContext";
+import React, { useEffect } from "react";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
-import ProductDetailPage from "./pages/ProductDetailPage";
-import CartPage from "./pages/CartPage";
-import Services from "./pages/Services";
-import Deals from "./components/Deals";
-import About from "./components/About";
-import Contact from "./components/Contact";
+import ProductDetails from "./pages/ProductDetails";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Profile from "./pages/Profile";
+import NotFound from "./pages/NotFound";
 
-function App() {
-  return (
-    <ShopProvider>
-      <Router>
-        <div className="min-h-screen flex flex-col">
-          {/* Navbar */}
-          <Navbar />
-
-          {/* Main Content */}
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/product/:id" element={<ProductDetailPage />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/deals" element={<Deals/>} />
-              <Route path="/about" element={<About/>} />
-              <Route path="/contact" element={<Contact/>} />
-
-            </Routes>
-          </main>
-
-          {/* Footer */}
-          <Footer />
-        </div>
-      </Router>
-    </ShopProvider>
-  );
+function ProductsRoute() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const scopeKey = ["q", "category", "brand", "deals"]
+    .map((key) => params.get(key) || "")
+    .join("|");
+  return <Products key={scopeKey} />;
 }
 
-export default App;
+function ScrollManager() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      const target = document.getElementById(hash.slice(1));
+      if (target) {
+        target.scrollIntoView();
+        return;
+      }
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname, hash]);
+
+  return null;
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <CartProvider>
+        <BrowserRouter>
+          <ScrollManager />
+          <div className="flex min-h-screen flex-col bg-white text-ink">
+            <Navbar />
+            <main id="main" className="flex-1">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/products" element={<ProductsRoute />} />
+                <Route path="/product/:slug" element={<ProductDetails />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </BrowserRouter>
+      </CartProvider>
+    </AuthProvider>
+  );
+}
