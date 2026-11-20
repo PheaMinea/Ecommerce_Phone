@@ -1,197 +1,243 @@
 import React from "react";
 import {
   ArrowRight,
+  BadgeCheck,
+  BadgeDollarSign,
+  BatteryCharging,
+  Camera,
+  CreditCard,
+  FoldHorizontal,
   Headset,
+  Headphones,
   RotateCcw,
   ShieldCheck,
+  Smartphone,
   Truck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Hero from "../components/Hero";
 import ProductGrid from "../components/ProductGrid";
 import SectionHeading from "../components/SectionHeading";
-import CategoryCard from "../components/CategoryCard";
+import BrandCard from "../components/BrandCard";
+import CategoryTile from "../components/CategoryTile";
 import Testimonials from "../components/Testimonials";
 import Newsletter from "../components/Newsletter";
 import PhoneArt from "../components/PhoneArt";
-import {
-  brands,
-  categories,
-  getProductBySlug,
-  products,
-} from "../data/products";
+import ComparisonSection from "../components/ComparisonSection";
+import FaqSection from "../components/FaqSection";
+import { brands, categories, getProductBySlug, products } from "../data/products";
 
-const services = [
+const reasons = [
   {
-    Icon: Truck,
-    title: "Free next-day delivery",
-    copy: "Order before 4pm on orders over $999.",
+    Icon: BadgeCheck,
+    title: "100% genuine products",
+    copy: "Sealed, unlocked and sourced from official distributors.",
   },
   {
     Icon: ShieldCheck,
-    title: "24-month warranty",
-    copy: "Every device, sealed and covered.",
+    title: "Official warranty",
+    copy: "24-month manufacturer warranty registered for you.",
   },
   {
-    Icon: RotateCcw,
-    title: "30-day returns",
-    copy: "Changed your mind? Send it back free.",
+    Icon: Truck,
+    title: "Fast delivery",
+    copy: "Free express over $499 — most orders arrive next day.",
+  },
+  {
+    Icon: CreditCard,
+    title: "Secure payment",
+    copy: "Card, KHQR and cash on delivery, all fully protected.",
   },
   {
     Icon: Headset,
-    title: "Advice from people",
-    copy: "Real specialists, seven days a week.",
+    title: "Real customer support",
+    copy: "Specialists on call seven days a week, not a bot.",
   },
 ];
 
+const categoryIcons = {
+  flagship: Smartphone,
+  foldable: FoldHorizontal,
+  camera: Camera,
+  value: BadgeDollarSign,
+  audio: Headphones,
+  accessories: BatteryCharging,
+};
+
 export default function Home() {
-  const featured = products.filter((product) => product.isFeatured).slice(0, 4);
-  const featuredIds = new Set(featured.map((product) => product.id));
-
-  const bestSellers = products
-    .filter(
-      (product) =>
-        product.isBestSeller &&
-        product.art.type === "phone" &&
-        !featuredIds.has(product.id)
-    )
-    .slice(0, 4);
-  const bestSellerIds = new Set(bestSellers.map((product) => product.id));
-
-  const newArrivals = products
-    .filter(
-      (product) =>
-        product.isNew && !featuredIds.has(product.id) && !bestSellerIds.has(product.id)
-    )
+  const phoneProducts = products.filter((product) => product.art?.type === "phone");
+  const featuredProducts = phoneProducts.filter((product) => product.isFeatured).slice(0, 3);
+  const bestSellers = [...phoneProducts]
+    .filter((product) => product.isBestSeller)
+    .sort((a, b) => b.reviewCount - a.reviewCount)
+    .slice(0, 3);
+  const newArrivals = [...phoneProducts]
+    .filter((product) => product.isNew)
     .sort((a, b) => b.releaseYear - a.releaseYear || b.id - a.id)
-    .slice(0, 4);
+    .slice(0, 3);
 
+  const brandProducts = brands.map((brand) => {
+    const pool = phoneProducts.filter((product) => product.brand === brand.name);
+    return { brand, product: pool[0], count: pool.length };
+  });
   const offerA = getProductBySlug("galaxy-s26-ultra");
-  const offerB = getProductBySlug("oppo-find-x9-pro");
+  const offerB = getProductBySlug("xiaomi-17-pro");
 
   return (
     <>
+      {/* 1. Announcement bar and navigation render globally in App. */}
+
+      {/* 2. Hero */}
       <Hero />
 
-      {/* Service strip */}
-      <section id="service" className="scroll-mt-24 border-b border-line bg-white">
-        <div className="wrap grid grid-cols-2 gap-x-4 gap-y-6 py-8 lg:grid-cols-4">
-          {services.map(({ Icon, title, copy }) => (
-            <div key={title} className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ice text-navy">
-                {React.createElement(Icon, { size: 18, "aria-hidden": true })}
-              </span>
-              <div>
-                <h2 className="text-sm font-semibold text-navy">{title}</h2>
-                <p className="mt-0.5 text-xs leading-relaxed text-muted">{copy}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Brands */}
-      <section id="brands" className="scroll-mt-24 border-b border-line bg-white py-7">
-        <div className="wrap flex flex-col items-center gap-5 lg:flex-row lg:justify-between">
-          <p className="eyebrow shrink-0 text-muted">Authorised stock · five brands</p>
-          <div className="grid w-full grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-5 lg:w-auto lg:gap-x-10">
+      {/* 3. Featured brands */}
+      <section className="border-b border-line bg-white py-8 sm:py-10">
+        <div className="wrap">
+          <p className="eyebrow text-center text-muted">Featured brands</p>
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {brands.map((brand) => (
               <Link
                 key={brand.name}
                 to={`/products?brand=${encodeURIComponent(brand.name)}`}
-                className="group text-center"
+                className="flex min-h-14 items-center justify-center rounded-xl border border-transparent px-3 text-center font-display text-sm font-semibold text-slate-500 transition-colors hover:border-line hover:bg-[#F8FAFC] hover:text-[#2563EB] sm:text-base"
               >
-                <span className="font-display text-lg font-bold tracking-tight text-muted transition-colors group-hover:text-navy">
-                  {brand.name}
-                </span>
-                <span className="mt-0.5 block font-mono text-[9px] uppercase tracking-[0.1em] text-muted transition-colors group-hover:text-blue">
-                  {brand.since}
-                </span>
+                {brand.name}
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Categories */}
-      <section id="categories" className="section scroll-mt-24 bg-ice">
+      {/* 4. Shop by categories */}
+      <section id="categories" className="section scroll-mt-24 bg-[#F8FAFC]">
         <div className="wrap">
           <SectionHeading
-            eyebrow="Shop by category"
-            title="Start with how you use your phone."
-            copy="Six ways into the catalog, each with a short list of devices worth your time."
+            eyebrow="Find your fit"
+            title="Shop by category"
+            copy="Start with the kind of device you need. We’ll help you find the right one."
             link="/products"
-            linkLabel="Browse everything"
+            linkLabel="Browse all phones"
           />
-          <div className="mt-9 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-7">
+            <CategoryTile
+              title="All products"
+              count={products.length}
+              Icon={Smartphone}
+              to="/products"
+            />
             {categories.map((category) => (
-              <CategoryCard
+              <CategoryTile
                 key={category.slug}
-                category={category}
+                title={category.name}
                 count={products.filter((product) => product.category === category.slug).length}
+                Icon={categoryIcons[category.slug] || Smartphone}
+                to={`/products?category=${category.slug}`}
               />
             ))}
           </div>
         </div>
       </section>
 
-      {/* Featured */}
-      <section id="featured" className="section scroll-mt-24 bg-white pt-0 sm:pt-0">
+      {/* 5. Featured products */}
+      <section id="featured" className="section scroll-mt-24 bg-white">
         <div className="wrap">
           <SectionHeading
-            eyebrow="Featured this week"
-            title="The four we keep recommending."
-            copy="Picked on sustained performance, camera consistency and support — not on commission."
-            link="/products?sort=rating"
-            linkLabel="Top rated"
+            eyebrow="Handpicked for you"
+            title="Featured smartphones"
+            copy="A few standout devices, selected for the details that make a difference."
+            link="/products"
+            linkLabel="Explore the collection"
           />
-          <ProductGrid products={featured} className="mt-9" />
+          <ProductGrid products={featuredProducts} className="mt-8" />
         </div>
       </section>
 
-      {/* Offers */}
-      <section id="offers" className="section scroll-mt-24 bg-[#f1f5f9] pt-0 sm:pt-0">
+      {/* 6. Best sellers */}
+      <section id="best-sellers" className="section scroll-mt-24 bg-[#F8FAFC]">
         <div className="wrap">
-          <div className="relative overflow-hidden rounded-2xl border border-line bg-white">
-            <div className="relative grid items-center gap-8 p-6 sm:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:p-12">
+          <SectionHeading
+            eyebrow="Customer favorites"
+            title="Best sellers"
+            copy="The phones customers love, rated and reviewed by people who own them."
+            link="/products?sort=popular"
+            linkLabel="Shop best sellers"
+          />
+          <ProductGrid products={bestSellers} className="mt-8" />
+        </div>
+      </section>
+
+      {/* 7. New arrivals */}
+      <section id="new-arrivals" className="section scroll-mt-24 bg-white">
+        <div className="wrap">
+          <SectionHeading
+            eyebrow="Just landed"
+            title="New arrivals"
+            copy="Meet the latest releases from the world’s leading smartphone makers."
+            link="/products?sort=newest"
+            linkLabel="See what’s new"
+          />
+          <ProductGrid products={newArrivals} className="mt-8" />
+        </div>
+      </section>
+
+      {/* 8. Special offers */}
+      <section id="promotions" className="scroll-mt-24 bg-[#F8FAFC] pb-14 sm:pb-20">
+        <div className="wrap">
+          <div className="plate-dark relative overflow-hidden rounded-[24px] px-6 py-8 sm:px-10 sm:py-10 lg:px-14 lg:py-12">
+            <div
+              className="pointer-events-none absolute -left-24 top-1/2 h-[380px] w-[380px] -translate-y-1/2 rounded-full bg-blue/25 blur-3xl"
+              aria-hidden="true"
+            />
+            <div className="relative grid items-center gap-8 lg:grid-cols-[1.08fr_0.92fr]">
               <div>
-                <span className="badge-sale">Up to $240 off</span>
-                <h2 className="type-section mt-4 max-w-md text-ink">
-                  Flagship performance. Last season's price.
+                <span className="inline-flex items-center gap-2 rounded-full border border-blue/30 bg-blue/10 px-3 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-blue-soft">
+                  Limited-time offers
+                </span>
+                <h2 className="type-section mt-4 max-w-lg text-white">
+                  A smarter upgrade, at a better price.
                 </h2>
-                <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-                  We clear end-of-cycle stock properly — sealed, full warranty, and marked
-                  down because a new model arrived. Not because something is wrong with it.
+                <p className="mt-3 max-w-md text-sm leading-relaxed text-white/65">
+                  Find a great price on genuine, sealed phones — all backed by the official
+                  manufacturer warranty.
                 </p>
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                   <Link to="/products?deals=1" className="btn-primary group">
-                    Shop current offers
+                    Shop special offers
                     <ArrowRight
                       size={16}
                       className="transition-transform duration-200 group-hover:translate-x-0.5"
                       aria-hidden="true"
                     />
                   </Link>
-                  <span className="text-[11px] uppercase tracking-[0.12em] text-muted">
-                    While stock lasts
-                  </span>
+                  <Link
+                    to="/products"
+                    className="text-sm font-semibold text-white/70 transition-colors hover:text-white"
+                  >
+                    Explore all phones
+                  </Link>
                 </div>
               </div>
 
-              <div className="relative flex items-end justify-center gap-2 sm:gap-4">
+              <div className="relative flex items-end justify-center gap-1 sm:gap-3">
                 <Link
                   to={`/product/${offerA.slug}`}
-                  className="relative block h-[230px] w-1/2 max-w-[170px] sm:h-[290px]"
+                  className="relative block h-[210px] w-1/2 max-w-[165px] sm:h-[260px]"
                   aria-label={`View ${offerA.name}`}
                 >
                   <PhoneArt product={offerA} className="h-full" />
+                  <span className="absolute -right-2 top-2 rounded-full bg-[#EF4444] px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-wider text-white">
+                    Save $120
+                  </span>
                 </Link>
                 <Link
                   to={`/product/${offerB.slug}`}
-                  className="relative hidden h-[260px] w-1/2 max-w-[180px] sm:block"
+                  className="relative hidden h-[235px] w-1/2 max-w-[170px] sm:block"
                   aria-label={`View ${offerB.name}`}
                 >
                   <PhoneArt product={offerB} className="h-full" />
+                  <span className="absolute -right-2 top-6 rounded-full bg-[#EF4444] px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-wider text-white">
+                    Save $100
+                  </span>
                 </Link>
               </div>
             </div>
@@ -199,36 +245,74 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Best sellers */}
-      <section className="section bg-ice">
-        <div className="wrap">
-          <SectionHeading
-            eyebrow="Best selling phones"
-            title="What everyone else is buying."
-            copy="Ranked by orders placed in the last 30 days."
-            link="/products?sort=popular"
-            linkLabel="See the ranking"
-          />
-          <ProductGrid products={bestSellers} className="mt-9" />
-        </div>
-      </section>
-
-      {/* New arrivals */}
+      {/* 9. Shop by brand */}
       <section className="section bg-white">
         <div className="wrap">
           <SectionHeading
-            eyebrow="New arrivals"
-            title="Just landed in the studio."
-            copy="The latest generation, unboxed and checked before anything goes on sale."
-            link="/products?sort=newest"
-            linkLabel="All new arrivals"
+            eyebrow="Explore the makers"
+            title="Shop by brand"
+            copy="Discover the latest devices and signature features from brands you trust."
+            link="/products"
+            linkLabel="Browse every phone"
           />
-          <ProductGrid products={newArrivals} className="mt-9" />
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+            {brandProducts.map(({ brand, product, count }) => (
+              <BrandCard key={brand.name} brand={brand} product={product} count={count} />
+            ))}
+          </div>
         </div>
       </section>
 
+      {/* 10. Smartphone comparison */}
+      <ComparisonSection />
+
+      {/* 11. Why shop with us */}
+      <section id="why-us" className="section scroll-mt-24 bg-[#F8FAFC]">
+        <div className="wrap">
+          <SectionHeading
+            eyebrow="Why shop with us"
+            title="The details matter after checkout."
+            copy="A premium phone deserves more than a marketplace listing. This is what comes with every order."
+          />
+          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-5">
+            {reasons.map(({ Icon, title, copy }) => (
+              <div key={title} className="card p-5">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-soft text-blue">
+                  {React.createElement(Icon, { size: 20, "aria-hidden": true })}
+                </span>
+                <h3 className="mt-4 font-display text-sm font-bold text-navy">{title}</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted">{copy}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 rounded-xl border border-line bg-white px-4 py-3 text-xs text-muted">
+            <span className="flex items-center gap-1.5">
+              <RotateCcw size={14} className="text-blue" aria-hidden="true" />
+              30-day free returns
+            </span>
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck size={14} className="text-blue" aria-hidden="true" />
+              Official warranty on every device
+            </span>
+            <span className="flex items-center gap-1.5">
+              <BadgeCheck size={14} className="text-blue" aria-hidden="true" />
+              Genuine, sealed stock only
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* 12. Customer reviews */}
       <Testimonials />
+
+      {/* 13. FAQ */}
+      <FaqSection />
+
+      {/* 14. Newsletter */}
       <Newsletter />
+
+      {/* 15. Footer renders globally in App. */}
     </>
   );
 }

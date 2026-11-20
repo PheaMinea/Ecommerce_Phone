@@ -3,13 +3,19 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 const AuthContext = createContext(null);
 const USER_KEY = "north_user_v1";
 
-const readUser = () => {
+const readStoredUser = (storage) => {
   try {
-    const raw = localStorage.getItem(USER_KEY);
+    const raw = storage.getItem(USER_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
+};
+
+const readAuthState = () => {
+  const persistentUser = readStoredUser(localStorage);
+  if (persistentUser) return { user: persistentUser, remember: true };
+  return { user: readStoredUser(sessionStorage), remember: false };
 };
 
 const titleCase = (value) =>
@@ -21,19 +27,28 @@ const titleCase = (value) =>
     .join(" ");
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(readUser);
+  const [authState, setAuthState] = useState(readAuthState);
+  const { user, remember } = authState;
 
   useEffect(() => {
     try {
-      if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
-      else localStorage.removeItem(USER_KEY);
-    } catch {
-      /* ignore storage errors */
-    }
-  }, [user]);
+      if (!user) {
+        localStorage.removeItem(USER_KEY);
+        sessionStorage.removeItem(USER_KEY);
+        return;
+      }
 
-  const login = (email) => {
-    const existing = readUser();
+      const activeStorage = remember ? localStorage : sessionStorage;
+      const inactiveStorage = remember ? sessionStorage : localStorage;
+      activeStorage.setItem(USER_KEY, JSON.stringify(user));
+      inactiveStorage.removeItem(USER_KEY);
+    } catch {
+      /* Keep the signed-in state for this session when storage is unavailable. */
+    }
+  }, [user, remember]);
+
+  const login = (email, shouldRemember = true) => {
+    const existing = readAuthState().user;
     const name =
       existing && existing.email.toLowerCase() === email.toLowerCase()
         ? existing.name
@@ -44,7 +59,7 @@ export function AuthProvider({ children }) {
       phone: existing?.phone || "",
       joined: existing?.joined || new Date().toISOString().slice(0, 10),
     };
-    setUser(next);
+    setAuthState({ user: next, remember: shouldRemember });
     return next;
   };
 
@@ -55,15 +70,17 @@ export function AuthProvider({ children }) {
       phone,
       joined: new Date().toISOString().slice(0, 10),
     };
-    setUser(next);
+    setAuthState({ user: next, remember: true });
     return next;
   };
 
-  const updateProfile = (changes) => {
-    setUser((current) => ({ ...(current || {}), ...changes }));
-  };
+  const updateProfile = (changes) =>
+    setAuthState((current) => ({
+      ...current,
+      user: { ...(current.user || {}), ...changes },
+    }));
 
-  const logout = () => setUser(null);
+  const logout = () => setAuthState({ user: null, remember: true });
 
   return (
     <AuthContext.Provider

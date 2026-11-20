@@ -403,6 +403,15 @@ export default function PhoneArt({ product, view = "front", color, className = "
   if (type === "buds") return <BudsArt product={product} color={color} className={className} />;
   if (type === "powerbank")
     return <PowerBankArt product={product} color={color} className={className} />;
+  if (product.art?.image) {
+    return (
+      <img
+        src={product.art.image}
+        alt={`${product.name} product photo`}
+        className={`block h-full w-auto max-w-full object-contain ${className}`}
+      />
+    );
+  }
 
   return <PhoneBody product={product} view={view} color={color} className={className} />;
 }

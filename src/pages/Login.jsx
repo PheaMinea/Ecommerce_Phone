@@ -35,7 +35,7 @@ export default function Login() {
       document.getElementById(Object.keys(next)[0])?.focus();
       return;
     }
-    const user = login(email.trim());
+    const user = login(email.trim(), remember);
     showToast(`Welcome back, ${user.name.split(" ")[0]}`);
     navigate("/profile");
   };
@@ -47,14 +47,14 @@ export default function Login() {
       return;
     }
     setErrors((current) => ({ ...current, email: "" }));
-    showToast(`Password reset link sent to ${email.trim()}`, "info");
+    showToast("Password reset is not available in this demo.", "info");
   };
 
   return (
     <AuthShell
       eyebrow="Welcome back"
       title="Sign in to your account"
-      subtitle="Track orders, keep your saved list in sync and check out faster."
+      subtitle="Track orders, keep your wishlist in sync and check out faster."
       footer={
         <p>
           New to NORTH?{" "}

@@ -32,13 +32,13 @@ export default function SearchBar({
 
   const large = variant === "large";
   const resolvedPlaceholder =
-    placeholder || (large ? "Search phones, brands or accessories" : "Search devices");
+    placeholder || (large ? "Search iPhone, Galaxy, Pixel…" : "Search phones");
 
   return (
     <form
       role="search"
       onSubmit={submit}
-      className={`flex w-full items-center rounded-xl border border-line bg-white transition-colors focus-within:border-blue ${
+      className={`flex w-full items-center rounded-xl border border-line bg-white transition-colors focus-within:border-blue focus-within:ring-2 focus-within:ring-blue/15 ${
         large ? "h-12 pl-4 pr-1.5 shadow-sm" : "h-10 pl-3 pr-1"
       } ${className}`}
     >

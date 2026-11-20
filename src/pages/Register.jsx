@@ -66,7 +66,7 @@ export default function Register() {
     <AuthShell
       eyebrow="Create an account"
       title="Join NORTH"
-      subtitle="Save devices, follow deliveries and keep every warranty in one place."
+      subtitle="Save phones, follow deliveries and keep every warranty in one place."
       footer={
         <p>
           Already have an account?{" "}

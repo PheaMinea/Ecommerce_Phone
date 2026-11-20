@@ -7,6 +7,10 @@ const CartContext = createContext(null);
 const CART_KEY = "north_cart_v1";
 const WISHLIST_KEY = "north_wishlist_v1";
 const ORDERS_KEY = "north_orders_v1";
+const COMPARE_KEY = "north_compare_v1";
+const MAX_COMPARE = 3;
+const FREE_SHIPPING = 499;
+const STANDARD_SHIPPING = 19;
 
 const readStorage = (key, fallback) => {
   try {
@@ -34,6 +38,7 @@ export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState(() => readStorage(CART_KEY, []));
   const [wishlist, setWishlist] = useState(() => readStorage(WISHLIST_KEY, []));
   const [orders, setOrders] = useState(() => readStorage(ORDERS_KEY, demoOrders));
+  const [compare, setCompare] = useState(() => readStorage(COMPARE_KEY, []));
   const [coupon, setCoupon] = useState(null);
   const [toast, setToast] = useState(null);
   const toastTimer = useRef(null);
@@ -41,6 +46,7 @@ export function CartProvider({ children }) {
   useEffect(() => writeStorage(CART_KEY, cartItems), [cartItems]);
   useEffect(() => writeStorage(WISHLIST_KEY, wishlist), [wishlist]);
   useEffect(() => writeStorage(ORDERS_KEY, orders), [orders]);
+  useEffect(() => writeStorage(COMPARE_KEY, compare), [compare]);
   useEffect(() => () => clearTimeout(toastTimer.current), []);
 
   const showToast = useCallback((message, type = "success") => {
@@ -52,7 +58,11 @@ export function CartProvider({ children }) {
   const addToCart = useCallback(
     (product, quantity = 1, options = {}) => {
       const color = options.color || product.colors?.[0]?.name || "";
-      const storage = options.storage || product.storage?.[0]?.value || "";
+      const cheapestStorage = product.storage?.reduce(
+        (best, option) => (!best || option.delta < best.delta ? option : best),
+        null
+      );
+      const storage = options.storage || cheapestStorage?.value || "";
       const ram = options.ram || product.ramOptions?.[0] || "";
       const storageOption = product.storage?.find((option) => option.value === storage);
       const unitPrice = product.price + (storageOption?.delta || 0);
@@ -143,6 +153,24 @@ export function CartProvider({ children }) {
     showToast("Promotion removed", "info");
   }, [showToast]);
 
+  const toggleCompare = useCallback(
+    (productId) => {
+      setCompare((current) => {
+        if (current.includes(productId)) {
+          return current.filter((id) => id !== productId);
+        }
+        if (current.length >= MAX_COMPARE) {
+          showToast("You can compare up to three phones at a time", "info");
+          return current;
+        }
+        return [...current, productId];
+      });
+    },
+    [showToast]
+  );
+
+  const clearCompare = useCallback(() => setCompare([]), []);
+
   const toggleWishlist = useCallback(
     (productId) => {
       setWishlist((current) => {
@@ -162,12 +190,16 @@ export function CartProvider({ children }) {
       const items = cartItems.map((item) => ({ ...item }));
       const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const discount = coupon ? Math.round(subtotal * (coupon.percent / 100)) : 0;
-      const shipping = subtotal === 0 || subtotal - discount >= 999 ? 0 : 19;
+      const standardShipping =
+        subtotal === 0 || subtotal - discount >= FREE_SHIPPING ? 0 : STANDARD_SHIPPING;
+      const shipping =
+        typeof details.shipping === "number" ? details.shipping : standardShipping;
       const order = {
         id: `NR-${Math.floor(10000 + Math.random() * 89999)}`,
         date: new Date().toISOString().slice(0, 10),
         status: "Processing",
         payment: details.payment,
+        delivery: details.delivery || "Standard",
         address: `${details.address}, ${details.city} ${details.postalCode}, ${details.country}`,
         email: details.email,
         phone: details.phone,
@@ -200,7 +232,8 @@ export function CartProvider({ children }) {
       0
     );
     const couponDiscount = coupon ? Math.round(subtotal * (coupon.percent / 100)) : 0;
-    const shipping = subtotal === 0 || subtotal - couponDiscount >= 999 ? 0 : 19;
+    const shipping =
+      subtotal === 0 || subtotal - couponDiscount >= FREE_SHIPPING ? 0 : STANDARD_SHIPPING;
     return {
       subtotal,
       compareAt,
@@ -218,6 +251,7 @@ export function CartProvider({ children }) {
     cartCount,
     wishlist,
     orders,
+    compare,
     coupon,
     totals,
     toast,
@@ -228,9 +262,12 @@ export function CartProvider({ children }) {
     applyCoupon,
     removeCoupon,
     toggleWishlist,
+    toggleCompare,
+    clearCompare,
     placeOrder,
     showToast,
     isWishlisted: (productId) => wishlist.includes(productId),
+    isCompared: (productId) => compare.includes(productId),
     cartItemProduct: (item) => getProductById(item.id),
   };
 

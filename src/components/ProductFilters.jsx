@@ -1,6 +1,6 @@
 import React from "react";
 import { RotateCcw } from "lucide-react";
-import { priceBands, screenBands } from "../data/products";
+import { priceBands } from "../data/products";
 
 function Group({ title, children }) {
   return (
@@ -13,7 +13,7 @@ function Group({ title, children }) {
   );
 }
 
-function CheckRow({ id, label, checked, onChange }) {
+function CheckRow({ id, label, hint, checked, onChange }) {
   return (
     <label
       htmlFor={id}
@@ -26,7 +26,10 @@ function CheckRow({ id, label, checked, onChange }) {
         onChange={onChange}
         className="h-4 w-4 rounded border-line text-blue focus:ring-blue"
       />
-      <span className="leading-tight">{label}</span>
+      <span className="flex-1 leading-tight">{label}</span>
+      {hint != null && (
+        <span className="font-mono text-[10px] text-muted/80">{hint}</span>
+      )}
     </label>
   );
 }
@@ -35,10 +38,11 @@ export default function ProductFilters({
   filters,
   setFilters,
   onClear,
+  onSelectCategory,
+  onToggleDeals,
   brandList,
-  ramList,
+  categoryList,
   storageList,
-  osList,
   activeCount,
   idPrefix = "desktop",
 }) {
@@ -93,6 +97,32 @@ export default function ProductFilters({
             onChange={() => toggle("brands", brand)}
           />
         ))}
+      </Group>
+
+      <Group title="Category">
+        <div className="flex flex-wrap gap-1.5">
+          {categoryList.map((category) => {
+            const active = filters.categories.includes(category.slug);
+            return (
+              <button
+                key={category.slug}
+                type="button"
+                onClick={() => onSelectCategory(active ? "" : category.slug)}
+                aria-pressed={active}
+                className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                  active
+                    ? "border-blue bg-blue text-white"
+                    : "border-line bg-white text-muted hover:border-navy/30 hover:text-navy"
+                }`}
+              >
+                {category.name}
+                <span className={`ml-1.5 font-mono text-[9px] ${active ? "text-white/70" : "text-muted/70"}`}>
+                  {category.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </Group>
 
       <Group title="Price">
@@ -158,18 +188,6 @@ export default function ProductFilters({
         </div>
       </Group>
 
-      <Group title="RAM">
-        {ramList.map((ram) => (
-          <CheckRow
-            key={ram}
-            id={`${idPrefix}-ram-${ram}`}
-            label={ram}
-            checked={filters.rams.includes(ram)}
-            onChange={() => toggle("rams", ram)}
-          />
-        ))}
-      </Group>
-
       <Group title="Storage">
         {storageList.map((storage) => (
           <CheckRow
@@ -182,28 +200,21 @@ export default function ProductFilters({
         ))}
       </Group>
 
-      <Group title="Screen size">
-        {screenBands.map((band, index) => (
-          <CheckRow
-            key={band.label}
-            id={`${idPrefix}-screen-${index}`}
-            label={band.label}
-            checked={filters.screens.includes(band.label)}
-            onChange={() => toggle("screens", band.label)}
-          />
-        ))}
-      </Group>
-
-      <Group title="Operating system">
-        {osList.map((os) => (
-          <CheckRow
-            key={os}
-            id={`${idPrefix}-os-${os}`}
-            label={os}
-            checked={filters.os.includes(os)}
-            onChange={() => toggle("os", os)}
-          />
-        ))}
+      <Group title="Availability">
+        <CheckRow
+          id={`${idPrefix}-instock`}
+          label="In stock only"
+          checked={filters.inStock}
+          onChange={() =>
+            setFilters((current) => ({ ...current, inStock: !current.inStock }))
+          }
+        />
+        <CheckRow
+          id={`${idPrefix}-deals`}
+          label="On promotion"
+          checked={filters.deals}
+          onChange={onToggleDeals}
+        />
       </Group>
     </div>
   );

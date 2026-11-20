@@ -14,47 +14,71 @@ import { useAuth } from "../context/AuthContext";
 import SearchBar from "./SearchBar";
 
 const navLinks = [
-  { to: "/products", label: "Shop all" },
-  { to: "/products?category=flagship", label: "Flagships" },
-  { to: "/products?category=foldable", label: "Foldables" },
-  { to: "/products?deals=1", label: "Deals" },
+  { to: "/", label: "Home" },
+  { to: "/products", label: "Shop" },
+  { to: "/#categories", label: "Categories" },
+  { to: "/products?deals=1", label: "Sale" },
+  { to: "/about", label: "About" },
+  { to: "/contact", label: "Contact" },
 ];
 
 const drawerGroups = [
   {
     title: "Shop",
     links: [
-      { to: "/products", label: "All devices" },
+      { to: "/products", label: "All products" },
       { to: "/products?category=flagship", label: "Flagships" },
       { to: "/products?category=foldable", label: "Foldables" },
       { to: "/products?category=camera", label: "Camera-first" },
       { to: "/products?category=value", label: "Best value" },
       { to: "/products?category=audio", label: "Audio" },
       { to: "/products?category=accessories", label: "Accessories" },
-      { to: "/products?deals=1", label: "Deals" },
+      { to: "/products?deals=1", label: "Promotions" },
+    ],
+  },
+  {
+    title: "Brands",
+    links: [
+      { to: "/products?brand=Apple", label: "Apple iPhone" },
+      { to: "/products?brand=Samsung", label: "Samsung Galaxy" },
+      { to: "/products?brand=Xiaomi", label: "Xiaomi" },
+      { to: "/products?brand=OPPO", label: "OPPO" },
+      { to: "/products?brand=vivo", label: "vivo" },
+      { to: "/products?brand=Google%20Pixel", label: "Google Pixel" },
     ],
   },
   {
     title: "Account",
     links: [
       { to: "/profile", label: "My profile" },
-      { to: "/profile?tab=orders", label: "Orders" },
-      { to: "/profile?tab=wishlist", label: "Saved items" },
+      { to: "/orders", label: "Order history" },
+      { to: "/wishlist", label: "Wishlist" },
       { to: "/login", label: "Sign in" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { to: "/about", label: "About Us" },
+      { to: "/contact", label: "Contact Us" },
     ],
   },
 ];
 
-function Logo({ onClick }) {
+export function Logo({ onClick, tone = "dark" }) {
   return (
     <Link
       to="/"
       onClick={onClick}
       className="flex shrink-0 items-center"
-      aria-label="NORTH — home"
+      aria-label="Phone Store — home"
     >
-      <span className="font-display text-[22px] font-bold leading-none tracking-[-0.05em] text-ink">
-        NORTH<span className="text-blue">.</span>
+      <span
+        className={`font-display text-[22px] font-bold leading-none tracking-[-0.045em] ${
+          tone === "light" ? "text-white" : "text-navy"
+        }`}
+      >
+        Phone<span className="text-blue"> Store</span>
       </span>
     </Link>
   );
@@ -73,7 +97,7 @@ export default function Navbar() {
   };
 
   const isActive = (to) => {
-    if (to === "/") return location.pathname === "/";
+    if (to.includes("#")) return false;
     const [path, search] = to.split("?");
     if (location.pathname !== path) return false;
     const currentParams = new URLSearchParams(location.search);
@@ -119,32 +143,48 @@ export default function Navbar() {
       </a>
 
       {/* Announcement */}
-      <div className="border-b border-line bg-ice">
+      <div className="bg-navy-deep text-white/60">
         <div className="wrap flex h-9 items-center justify-between gap-4">
-          <p className="flex items-center gap-2 text-[11px] font-medium text-muted">
-            <Truck size={12} className="text-blue" aria-hidden="true" />
-            Free next-day delivery over $999
+          <p className="flex items-center gap-2 text-[11px]">
+            <Truck size={12} className="text-orange" aria-hidden="true" />
+            Free express delivery over $499
           </p>
-          <p className="hidden text-[11px] text-muted md:block">
-            30-day returns · 24-month warranty · Trade-in credit on every flagship
+          <p className="hidden text-[11px] md:block">
+            Official warranty · Genuine stock · KHQR &amp; cash on delivery
           </p>
-          <a
-            href="tel:+442079460321"
-            className="hidden text-[11px] font-medium text-muted transition-colors hover:text-ink sm:block"
-          >
-            Help · +44 20 7946 0321
-          </a>
+          <div className="hidden items-center gap-3 text-[11px] sm:flex">
+            <a
+              href="tel:+442079460321"
+              className="hidden transition-colors hover:text-white lg:block"
+            >
+              Help · +44 20 7946 0321
+            </a>
+            {user ? (
+              <Link to="/profile" className="transition-colors hover:text-white">
+                My account
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" className="transition-colors hover:text-white">
+                  Login
+                </Link>
+                <Link to="/register" className="transition-colors hover:text-white">
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-line bg-white/95 backdrop-blur-md">
-        <div className="wrap relative flex h-16 items-center gap-3">
+      <header className="sticky top-0 z-50 border-b border-line bg-white shadow-sm">
+        <div className="wrap relative flex h-[68px] items-center gap-3">
           <Logo onClick={closeOverlays} />
 
           <nav
             aria-label="Primary"
-            className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 lg:flex"
+            className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 xl:flex"
           >
             {navLinks.map((link) => {
               const active = isActive(link.to);
@@ -154,13 +194,13 @@ export default function Navbar() {
                   to={link.to}
                   onClick={closeOverlays}
                   aria-current={active ? "page" : undefined}
-                  className={`relative py-1 text-sm transition-colors ${
-                    active ? "font-medium text-ink" : "font-normal text-muted hover:text-ink"
+                  className={`relative py-1 text-[13px] transition-colors ${
+                    active ? "font-semibold text-navy" : "font-medium text-muted hover:text-navy"
                   }`}
                 >
                   {link.label}
                   {active && (
-                    <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-blue" />
+                    <span className="absolute -bottom-1.5 left-0 h-0.5 w-full rounded-full bg-blue" />
                   )}
                 </Link>
               );
@@ -168,12 +208,16 @@ export default function Navbar() {
           </nav>
 
           <div className="ml-auto flex items-center gap-0.5">
+            <SearchBar
+              variant="compact"
+              className="hidden w-[190px] xl:flex xl:w-[230px]"
+            />
             <button
               type="button"
               onClick={() => setSearchOpen((open) => !open)}
               aria-expanded={searchOpen}
               aria-label={searchOpen ? "Close search" : "Open search"}
-              className="flex h-11 w-11 items-center justify-center rounded-lg text-ink transition-colors hover:bg-ice"
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-navy transition-colors hover:bg-ice xl:hidden"
             >
               {searchOpen ? (
                 <X size={19} aria-hidden="true" />
@@ -183,14 +227,14 @@ export default function Navbar() {
             </button>
 
             <Link
-              to="/profile?tab=wishlist"
+              to="/wishlist"
               onClick={closeOverlays}
-              aria-label={`Saved items${wishlist.length ? `, ${wishlist.length}` : ""}`}
-              className="relative flex h-11 w-11 items-center justify-center rounded-lg text-ink transition-colors hover:bg-ice"
+              aria-label={`Wishlist${wishlist.length ? `, ${wishlist.length} saved` : ""}`}
+              className="relative hidden h-11 w-11 items-center justify-center rounded-lg text-navy transition-colors hover:bg-ice sm:flex"
             >
               <Heart size={19} aria-hidden="true" />
               {wishlist.length > 0 && (
-                <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-sale px-1 font-mono text-[9px] font-semibold text-white">
+                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange px-1 font-mono text-[9px] font-bold text-navy-deep">
                   {wishlist.length}
                 </span>
               )}
@@ -200,10 +244,10 @@ export default function Navbar() {
               to={user ? "/profile" : "/login"}
               onClick={closeOverlays}
               aria-label={user ? `Account — ${user.name}` : "Sign in"}
-              className="flex h-11 w-11 items-center justify-center rounded-lg text-ink transition-colors hover:bg-ice"
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-navy transition-colors hover:bg-ice"
             >
               {user ? (
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-ice text-[10px] font-semibold text-ink">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-soft text-[10px] font-semibold text-blue ring-1 ring-blue/20">
                   {initials}
                 </span>
               ) : (
@@ -214,12 +258,12 @@ export default function Navbar() {
             <Link
               to="/cart"
               onClick={closeOverlays}
-              aria-label={`Shopping bag, ${cartCount} ${cartCount === 1 ? "item" : "items"}`}
-              className="relative flex h-11 w-11 items-center justify-center rounded-lg text-ink transition-colors hover:bg-ice"
+              aria-label={`Shopping cart, ${cartCount} ${cartCount === 1 ? "item" : "items"}`}
+              className="relative flex h-11 w-11 items-center justify-center rounded-lg text-navy transition-colors hover:bg-ice"
             >
               <ShoppingBag size={19} aria-hidden="true" />
               {cartCount > 0 && (
-                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue px-1 font-mono text-[9px] font-semibold text-white">
+                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange px-1 font-mono text-[9px] font-bold text-navy-deep">
                   {cartCount}
                 </span>
               )}
@@ -230,7 +274,7 @@ export default function Navbar() {
               onClick={() => setMenuOpen(true)}
               aria-label="Open menu"
               aria-expanded={menuOpen}
-              className="flex h-11 w-11 items-center justify-center rounded-lg text-ink transition-colors hover:bg-ice lg:hidden"
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-navy transition-colors hover:bg-ice xl:hidden"
             >
               <Menu size={21} aria-hidden="true" />
             </button>
@@ -238,34 +282,36 @@ export default function Navbar() {
         </div>
 
         {searchOpen && (
-          <div className="border-t border-line bg-white py-3">
-            <div className="wrap"><div className="mx-auto max-w-2xl">
-              <SearchBar
-                variant="large"
-                onSearchComplete={() => setSearchOpen(false)}
-              />
-            </div></div>
+          <div className="border-t border-white/10 bg-navy-deep/95 py-3 backdrop-blur">
+            <div className="wrap">
+              <div className="mx-auto max-w-2xl">
+                <SearchBar
+                  variant="large"
+                  onSearchComplete={() => setSearchOpen(false)}
+                />
+              </div>
+            </div>
           </div>
         )}
       </header>
 
       {/* Mobile drawer */}
       {menuOpen && (
-        <div className="fixed inset-0 z-[80] lg:hidden">
+        <div className="fixed inset-0 z-[80] xl:hidden">
           <button
             type="button"
             aria-label="Close menu"
             onClick={() => setMenuOpen(false)}
-            className="absolute inset-0 h-full w-full cursor-default bg-ink/25 backdrop-blur-[2px] animate-fade"
+            className="animate-fade absolute inset-0 h-full w-full cursor-default bg-navy-deep/50 backdrop-blur-[2px]"
           />
           <div
             role="dialog"
             aria-modal="true"
             aria-label="Site menu"
-            className="animate-slide-right absolute inset-y-0 left-0 flex w-[88%] max-w-[350px] flex-col bg-white shadow-2xl"
+            className="animate-slide-right absolute inset-y-0 left-0 flex w-[88%] max-w-[360px] flex-col bg-white shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
-              <Logo onClick={() => setMenuOpen(false)} />
+              <Logo tone="dark" onClick={() => setMenuOpen(false)} />
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
@@ -279,7 +325,7 @@ export default function Navbar() {
             <div className="flex-1 overflow-y-auto px-5 py-5">
               <SearchBar variant="large" onSearchComplete={() => setMenuOpen(false)} />
 
-              <div className="mt-6 space-y-6">
+              <div className="mt-6 space-y-5">
                 {drawerGroups.map((group) => (
                   <div key={group.title}>
                     <p className="eyebrow text-muted">{group.title}</p>
@@ -289,7 +335,7 @@ export default function Navbar() {
                           <Link
                             to={link.to}
                             onClick={() => setMenuOpen(false)}
-                            className="flex items-center justify-between py-3 text-sm font-medium text-ink transition-colors hover:text-blue"
+                            className="flex items-center justify-between py-2.5 text-sm font-medium text-ink transition-colors hover:text-blue"
                           >
                             {link.label}
                             <span className="font-mono text-xs text-muted">→</span>
@@ -304,10 +350,10 @@ export default function Navbar() {
 
             <div className="border-t border-line bg-ice px-5 py-4">
               <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-                North Device Store
+                NORTH Device Store
               </p>
               <p className="mt-1 text-xs text-muted">
-                Free next-day delivery over $999 · 30-day returns
+                Free express delivery over $499 · 24-month warranty
               </p>
             </div>
           </div>

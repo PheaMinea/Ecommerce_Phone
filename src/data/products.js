@@ -1,11 +1,12 @@
 // NORTH. catalog — demo data for the storefront.
 
 export const brands = [
-  { name: "Apple", tag: "iPhone · AirPods · Watch", since: "Since 1976" },
-  { name: "Samsung", tag: "Galaxy · Fold · Buds", since: "Since 1938" },
-  { name: "Xiaomi", tag: "Leica optics · HyperOS", since: "Since 2010" },
-  { name: "OPPO", tag: "Find X · Hasselblad", since: "Since 2004" },
-  { name: "vivo", tag: "X series · ZEISS", since: "Since 2009" },
+  { name: "Apple", tag: "iPhone · AirPods · Watch", since: "Since 1976", blurb: "Titanium flagships and the tightest ecosystem in mobile." },
+  { name: "Samsung", tag: "Galaxy · Fold · Buds", since: "Since 1938", blurb: "Folding screens, S Pen precision and seven-year updates." },
+  { name: "Xiaomi", tag: "Leica optics · HyperOS", since: "Since 2010", blurb: "Leica camera systems at prices that undercut the flagships." },
+  { name: "OPPO", tag: "Find X · Hasselblad", since: "Since 2004", blurb: "Hasselblad colour science and the fastest charging here." },
+  { name: "vivo", tag: "X series · ZEISS", since: "Since 2009", blurb: "ZEISS APO telephoto optics and the brightest displays." },
+  { name: "Google Pixel", tag: "Pixel · Tensor · Gemini", since: "Since 2016", blurb: "The cleanest Android, with the smartest computational camera." },
 ];
 
 export const categories = [
@@ -68,6 +69,7 @@ export const products = [
       { name: "Silver", hex: "#d6d8db" },
     ],
     storage: [
+      { value: "128GB", delta: -100 },
       { value: "256GB", delta: 0 },
       { value: "512GB", delta: 200 },
       { value: "1TB", delta: 400 },
@@ -103,7 +105,7 @@ export const products = [
     isNew: true,
     releaseYear: 2026,
     accent: ["#0ea5e9", "#1e3a8a"],
-    art: { type: "phone", camera: appleCamera },
+    art: { type: "phone", camera: appleCamera, image: "/phones/iphone-17-pro-max.png" },
     reviews: [
       {
         name: "Daniel Okafor",
@@ -148,6 +150,7 @@ export const products = [
       { name: "Silver", hex: "#d6d8db" },
     ],
     storage: [
+      { value: "128GB", delta: -100 },
       { value: "256GB", delta: 0 },
       { value: "512GB", delta: 200 },
       { value: "1TB", delta: 400 },
@@ -182,7 +185,7 @@ export const products = [
     isNew: true,
     releaseYear: 2026,
     accent: ["#6366f1", "#1e293b"],
-    art: { type: "phone", camera: appleCamera },
+    art: { type: "phone", camera: appleCamera, image: "/phones/iphone-17-pro.png" },
   },
   {
     id: 3,
@@ -202,6 +205,7 @@ export const products = [
       { name: "Cloud White", hex: "#f1f0ec" },
     ],
     storage: [
+      { value: "128GB", delta: -100 },
       { value: "256GB", delta: 0 },
       { value: "512GB", delta: 200 },
       { value: "1TB", delta: 400 },
@@ -236,7 +240,7 @@ export const products = [
     isNew: true,
     releaseYear: 2026,
     accent: ["#38bdf8", "#0f172a"],
-    art: { type: "phone", camera: appleCamera },
+    art: { type: "phone", camera: appleCamera, image: "/phones/iphone-air.png" },
   },
   {
     id: 4,
@@ -256,6 +260,7 @@ export const products = [
       { name: "Titanium Blue", hex: "#4b6a8f" },
     ],
     storage: [
+      { value: "128GB", delta: -100 },
       { value: "256GB", delta: 0 },
       { value: "512GB", delta: 120 },
       { value: "1TB", delta: 360 },
@@ -290,7 +295,7 @@ export const products = [
     isNew: true,
     releaseYear: 2026,
     accent: ["#8b5cf6", "#1e1b4b"],
-    art: { type: "phone", camera: samsungCamera },
+    art: { type: "phone", camera: samsungCamera, image: "/phones/galaxy-s26-ultra.png" },
     reviews: [
       {
         name: "Priya Raman",
@@ -335,6 +340,7 @@ export const products = [
       { name: "Mint", hex: "#b9d8c9" },
     ],
     storage: [
+      { value: "128GB", delta: -100 },
       { value: "256GB", delta: 0 },
       { value: "512GB", delta: 120 },
     ],
@@ -368,7 +374,7 @@ export const products = [
     isNew: true,
     releaseYear: 2026,
     accent: ["#22d3ee", "#0f172a"],
-    art: { type: "phone", camera: samsungCamera },
+    art: { type: "phone", camera: samsungCamera, image: "/phones/galaxy-s26-plus.png" },
   },
   {
     id: 6,
@@ -387,6 +393,7 @@ export const products = [
       { name: "Jet Black", hex: "#232326" },
     ],
     storage: [
+      { value: "128GB", delta: -100 },
       { value: "256GB", delta: 0 },
       { value: "512GB", delta: 120 },
       { value: "1TB", delta: 360 },
@@ -421,7 +428,12 @@ export const products = [
     isNew: true,
     releaseYear: 2026,
     accent: ["#64748b", "#0f172a"],
-    art: { type: "phone", camera: samsungCamera, fold: true },
+    art: {
+      type: "phone",
+      camera: samsungCamera,
+      fold: true,
+      image: "/phones/galaxy-z-fold-7.jpg",
+    },
   },
   {
     id: 7,
@@ -441,6 +453,7 @@ export const products = [
       { name: "Green", hex: "#7c8f6e" },
     ],
     storage: [
+      { value: "128GB", delta: -100 },
       { value: "256GB", delta: 0 },
       { value: "512GB", delta: 100 },
     ],
@@ -474,7 +487,7 @@ export const products = [
     isNew: true,
     releaseYear: 2026,
     accent: ["#f97316", "#7c2d12"],
-    art: { type: "phone", camera: "circle" },
+    art: { type: "phone", camera: "circle", image: "/phones/xiaomi-17-pro.png" },
     reviews: [
       {
         name: "Kenji Mori",
@@ -512,6 +525,7 @@ export const products = [
       { name: "Pink", hex: "#e8c7c4" },
     ],
     storage: [
+      { value: "128GB", delta: -100 },
       { value: "256GB", delta: 0 },
       { value: "512GB", delta: 100 },
     ],
@@ -545,7 +559,7 @@ export const products = [
     isNew: true,
     releaseYear: 2026,
     accent: ["#f43f5e", "#4c0519"],
-    art: { type: "phone", camera: "circle" },
+    art: { type: "phone", camera: "circle", image: "/phones/xiaomi-17.png" },
   },
   {
     id: 9,
@@ -564,6 +578,7 @@ export const products = [
       { name: "Sand", hex: "#d8c3a5" },
     ],
     storage: [
+      { value: "128GB", delta: -100 },
       { value: "256GB", delta: 0 },
       { value: "512GB", delta: 100 },
     ],
@@ -597,7 +612,7 @@ export const products = [
     isNew: true,
     releaseYear: 2026,
     accent: ["#10b981", "#064e3b"],
-    art: { type: "phone", camera: "circle" },
+    art: { type: "phone", camera: "circle", image: "/phones/oppo-find-x9-pro.jpg" },
   },
   {
     id: 10,
@@ -616,6 +631,7 @@ export const products = [
       { name: "Desert Gold", hex: "#c9a87c" },
     ],
     storage: [
+      { value: "128GB", delta: -100 },
       { value: "256GB", delta: 0 },
       { value: "512GB", delta: 100 },
       { value: "1TB", delta: 300 },
@@ -650,13 +666,13 @@ export const products = [
     isNew: true,
     releaseYear: 2026,
     accent: ["#3b82f6", "#172554"],
-    art: { type: "phone", camera: "circle" },
+    art: { type: "phone", camera: "circle", image: "/phones/vivo-x300-pro.jpg" },
   },
   {
     id: 11,
     slug: "pixel-10-pro",
     name: "Google Pixel 10 Pro",
-    brand: "Google",
+    brand: "Google Pixel",
     category: "flagship",
     tagline: "The most helpful Android, with Tensor G5.",
     price: 999,
@@ -670,6 +686,7 @@ export const products = [
       { name: "Moonstone", hex: "#c9cbd3" },
     ],
     storage: [
+      { value: "128GB", delta: -100 },
       { value: "256GB", delta: 0 },
       { value: "512GB", delta: 100 },
     ],
@@ -703,7 +720,7 @@ export const products = [
     isNew: true,
     releaseYear: 2026,
     accent: ["#2dd4bf", "#0f766e"],
-    art: { type: "phone", camera: "bar" },
+    art: { type: "phone", camera: "bar", image: "/phones/pixel-10-pro.png" },
   },
   {
     id: 12,
@@ -722,6 +739,7 @@ export const products = [
       { name: "Ultra Violet", hex: "#6f5b9e" },
     ],
     storage: [
+      { value: "128GB", delta: -100 },
       { value: "256GB", delta: 0 },
       { value: "512GB", delta: 100 },
     ],
@@ -755,7 +773,7 @@ export const products = [
     isNew: true,
     releaseYear: 2026,
     accent: ["#ef4444", "#450a0a"],
-    art: { type: "phone", camera: "oneplus" },
+    art: { type: "phone", camera: "oneplus", image: "/phones/oneplus-15.jpg" },
   },
   {
     id: 13,
@@ -1088,6 +1106,14 @@ export const formatPrice = (value) =>
 
 export const discountPercent = (price, oldPrice) =>
   oldPrice && oldPrice > price ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
+
+/* Lowest configured price, so cards can show a truthful "From" figure. */
+export const getEntryDelta = (product) =>
+  (product.storage || []).reduce((min, option) => Math.min(min, option.delta), 0);
+
+export const getEntryPrice = (product) => product.price + getEntryDelta(product);
+export const getEntryOldPrice = (product) =>
+  product.oldPrice ? product.oldPrice + getEntryDelta(product) : 0;
 
 export const getProductBySlug = (slug) =>
   products.find((product) => product.slug === slug);

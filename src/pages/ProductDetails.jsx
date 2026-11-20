@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from "react";
 import {
+  ArrowLeftRight,
   BadgeCheck,
   ChevronRight,
+  CreditCard,
   Heart,
   RotateCcw,
   ShieldCheck,
@@ -51,11 +53,22 @@ export default function ProductDetails() {
 function ProductDetailsView({ slug }) {
   const navigate = useNavigate();
   const product = getProductBySlug(slug);
-  const { addToCart, toggleWishlist, isWishlisted } = useCart();
+  const {
+    addToCart,
+    toggleWishlist,
+    isWishlisted,
+    toggleCompare,
+    isCompared,
+  } = useCart();
+
+  const cheapestStorage = (product?.storage || []).reduce(
+    (best, option) => (!best || option.delta < best.delta ? option : best),
+    null
+  );
 
   const [view, setView] = useState("front");
   const [colorIndex, setColorIndex] = useState(0);
-  const [storageValue, setStorageValue] = useState(product?.storage?.[0]?.value || "");
+  const [storageValue, setStorageValue] = useState(cheapestStorage?.value || "");
   const [ramValue, setRamValue] = useState(product?.ramOptions?.[0] || "");
   const [quantity, setQuantity] = useState(1);
   const [tab, setTab] = useState("overview");
@@ -84,12 +97,12 @@ function ProductDetailsView({ slug }) {
     return (
       <div className="wrap flex min-h-[60vh] flex-col items-center justify-center py-20 text-center">
         <p className="eyebrow text-blue">404</p>
-        <h1 className="type-section mt-2 text-navy">That device isn't here.</h1>
+        <h1 className="type-section mt-2 text-navy">That product isn't here.</h1>
         <p className="mt-2 max-w-md text-sm text-muted">
-          It may have sold out or moved. Browse the current catalog to find the right phone.
+          It may have sold out or moved. Browse the current catalog to find the right device.
         </p>
         <Link to="/products" className="btn-primary mt-6">
-          Browse all devices
+          Browse all phones
         </Link>
       </div>
     );
@@ -99,8 +112,10 @@ function ProductDetailsView({ slug }) {
   const color = product.colors[colorIndex] || product.colors[0];
   const storageOption = product.storage?.find((option) => option.value === storageValue);
   const unitPrice = product.price + (storageOption?.delta || 0);
-  const discount = discountPercent(unitPrice, product.oldPrice);
+  const compareAt = product.oldPrice ? product.oldPrice + (storageOption?.delta || 0) : 0;
+  const discount = discountPercent(unitPrice, compareAt);
   const saved = isWishlisted(product.id);
+  const compared = isCompared(product.id);
   const isPhone = product.art?.type === "phone";
   const reviews = product.reviews || defaultReviews;
 
@@ -139,7 +154,7 @@ function ProductDetailsView({ slug }) {
           </Link>
           <ChevronRight size={13} aria-hidden="true" className="text-slate-300" />
           <Link to="/products" className="transition-colors hover:text-navy">
-            Shop
+            Products
           </Link>
           <ChevronRight size={13} aria-hidden="true" className="text-slate-300" />
           <Link
@@ -156,13 +171,11 @@ function ProductDetailsView({ slug }) {
       <div className="wrap grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)] lg:gap-12 lg:py-12">
         {/* Gallery */}
         <div>
-          <div className="plate relative flex h-[420px] items-center justify-center overflow-hidden rounded-xl border border-line p-8 sm:h-[520px]">
-            <div className="pointer-events-none absolute left-4 top-4 flex flex-col gap-1.5">
+          <div className="plate relative flex h-[400px] items-center justify-center overflow-hidden rounded-2xl border border-line p-8 sm:h-[520px]">
+            <div className="pointer-events-none absolute left-4 top-4 z-10 flex flex-col gap-1.5">
               {discount > 0 && <span className="badge-sale">-{discount}%</span>}
               {product.badge && (
-                <span className="inline-flex items-center rounded-md border border-line bg-white/95 px-2 py-1 font-mono text-[10px] font-medium uppercase tracking-wider text-ink">
-                  {product.badge}
-                </span>
+                <span className="badge-soft">{product.badge}</span>
               )}
             </div>
 
@@ -170,9 +183,11 @@ function ProductDetailsView({ slug }) {
               type="button"
               onClick={() => toggleWishlist(product.id)}
               aria-pressed={saved}
-              aria-label={saved ? "Remove from saved items" : "Save this device"}
+              aria-label={saved ? "Remove from wishlist" : "Save this phone"}
               className={`absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border bg-white/95 shadow-sm transition-colors ${
-                saved ? "border-sale/30 text-sale" : "border-line text-muted hover:text-navy"
+                saved
+                  ? "border-orange/40 text-orange-deep"
+                  : "border-line text-muted hover:text-navy"
               }`}
             >
               <Heart size={18} fill={saved ? "currentColor" : "none"} aria-hidden="true" />
@@ -192,56 +207,40 @@ function ProductDetailsView({ slug }) {
             </span>
           </div>
 
-          {isPhone ? (
-            <div className="mt-3 grid grid-cols-3 gap-3">
-              {galleryViews.map((galleryView) => (
-                <button
-                  key={galleryView.id}
-                  type="button"
-                  onClick={() => setView(galleryView.id)}
-                  aria-label={galleryView.label}
-                  aria-pressed={view === galleryView.id}
-                  className={`plate flex h-24 items-center justify-center rounded-xl border p-3 transition-colors ${
-                    view === galleryView.id
-                      ? "border-blue ring-1 ring-blue/30"
-                      : "border-line hover:border-navy/30"
-                  }`}
-                >
-                  <PhoneArt
-                    product={product}
-                    view={galleryView.id}
-                    color={color?.hex}
-                    className="h-full"
-                  />
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="mt-3 grid grid-cols-3 gap-3">
-              {product.colors.map((entry, index) => (
-                <button
-                  key={entry.name}
-                  type="button"
-                  onClick={() => setColorIndex(index)}
-                  aria-label={`Show ${entry.name}`}
-                  aria-pressed={index === colorIndex}
-                  className={`plate flex h-24 items-center justify-center rounded-xl border p-3 transition-colors ${
-                    index === colorIndex
-                      ? "border-blue ring-1 ring-blue/30"
-                      : "border-line hover:border-navy/30"
-                  }`}
-                >
-                  <PhoneArt product={product} color={entry.hex} className="h-full" />
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="mt-3 grid grid-cols-3 gap-3">
+            {(isPhone ? galleryViews : product.colors.map((entry) => ({ id: entry.name, label: entry.name }))).map(
+              (entry, index) => {
+                const active = isPhone ? view === entry.id : index === colorIndex;
+                return (
+                  <button
+                    key={entry.id}
+                    type="button"
+                    onClick={() => (isPhone ? setView(entry.id) : setColorIndex(index))}
+                    aria-label={entry.label}
+                    aria-pressed={active}
+                    className={`plate flex h-24 items-center justify-center rounded-xl border p-3 transition-colors ${
+                      active
+                        ? "border-blue ring-1 ring-blue/30"
+                        : "border-line hover:border-navy/30"
+                    }`}
+                  >
+                    <PhoneArt
+                      product={product}
+                      view={isPhone ? entry.id : "front"}
+                      color={isPhone ? color?.hex : product.colors[index]?.hex}
+                      className="h-full"
+                    />
+                  </button>
+                );
+              }
+            )}
+          </div>
         </div>
 
         {/* Buy box */}
         <div className="self-start lg:sticky lg:top-[92px]">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-blue">
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-blue">
               {product.brand}
             </span>
             <span className="h-1 w-1 rounded-full bg-slate-300" aria-hidden="true" />
@@ -266,13 +265,11 @@ function ProductDetailsView({ slug }) {
             <span className="font-display text-3xl font-bold text-navy">
               {formatPrice(unitPrice)}
             </span>
-            {product.oldPrice > unitPrice && (
-              <span className="text-sm text-muted line-through">
-                {formatPrice(product.oldPrice)}
-              </span>
+            {compareAt > unitPrice && (
+              <span className="text-sm text-muted line-through">{formatPrice(compareAt)}</span>
             )}
             {discount > 0 && (
-              <span className="badge-sale">Save {formatPrice(product.oldPrice - unitPrice)}</span>
+              <span className="badge-sale">Save {formatPrice(compareAt - unitPrice)}</span>
             )}
           </div>
           <p className="mt-1 text-[11px] text-muted">
@@ -292,7 +289,7 @@ function ProductDetailsView({ slug }) {
             {product.colors.length > 1 && (
               <div>
                 <p className="text-[13px] font-medium text-ink">
-                  Finish: <span className="font-normal text-muted">{color?.name}</span>
+                  Color: <span className="font-normal text-muted">{color?.name}</span>
                 </p>
                 <div className="mt-2.5 flex flex-wrap gap-2.5">
                   {product.colors.map((entry, index) => (
@@ -331,9 +328,9 @@ function ProductDetailsView({ slug }) {
                         type="button"
                         onClick={() => setStorageValue(option.value)}
                         aria-pressed={active}
-                        className={`rounded-lg border px-4 py-2.5 text-left transition-colors ${
+                        className={`rounded-xl border px-4 py-2.5 text-left transition-colors ${
                           active
-                            ? "border-blue bg-blue/5 ring-1 ring-blue"
+                            ? "border-blue bg-blue-soft ring-1 ring-blue"
                             : "border-line hover:border-navy/30"
                         }`}
                       >
@@ -341,7 +338,11 @@ function ProductDetailsView({ slug }) {
                           {option.value}
                         </span>
                         <span className="block font-mono text-[10px] text-muted">
-                          {option.delta === 0 ? "+$0" : `+${formatPrice(option.delta)}`}
+                          {option.delta === 0
+                            ? "+$0"
+                            : `${option.delta > 0 ? "+" : "−"}${formatPrice(
+                                Math.abs(option.delta)
+                              )}`}
                         </span>
                       </button>
                     );
@@ -362,9 +363,9 @@ function ProductDetailsView({ slug }) {
                         type="button"
                         onClick={() => setRamValue(ram)}
                         aria-pressed={active}
-                        className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
+                        className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${
                           active
-                            ? "border-blue bg-blue/5 text-navy ring-1 ring-blue"
+                            ? "border-blue bg-blue-soft text-navy ring-1 ring-blue"
                             : "border-line text-ink hover:border-navy/30"
                         }`}
                       >
@@ -380,12 +381,12 @@ function ProductDetailsView({ slug }) {
               <QuantityStepper value={quantity} onChange={setQuantity} label="Quantity" />
               <span
                 className={`flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.1em] ${
-                  product.stock <= 8 ? "text-sale" : "text-mint"
+                  product.stock <= 8 ? "text-orange-ink" : "text-mint"
                 }`}
               >
                 <span
                   className={`h-1.5 w-1.5 rounded-full ${
-                    product.stock <= 8 ? "bg-sale" : "bg-mint"
+                    product.stock <= 8 ? "bg-orange" : "bg-mint"
                   }`}
                 />
                 {product.stock <= 8 ? `Only ${product.stock} left` : "In stock"}
@@ -395,25 +396,43 @@ function ProductDetailsView({ slug }) {
             <div className="grid gap-2 sm:grid-cols-2">
               <button type="button" onClick={handleAdd} className="btn-primary w-full">
                 <ShoppingBag size={16} aria-hidden="true" />
-                Add to bag
+                Add to cart
               </button>
               <button type="button" onClick={handleBuyNow} className="btn-navy w-full">
                 Buy now
               </button>
             </div>
 
-            <div className="space-y-2.5 rounded-xl border border-line bg-ice p-4">
+            <button
+              type="button"
+              onClick={() => toggleCompare(product.id)}
+              aria-pressed={compared}
+              className={`inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border text-xs font-semibold transition-colors ${
+                compared
+                  ? "border-blue bg-blue-soft text-blue"
+                  : "border-line text-muted hover:border-blue/40 hover:text-blue"
+              }`}
+            >
+              <ArrowLeftRight size={14} aria-hidden="true" />
+              {compared ? "In comparison — manage at the bottom" : "Add to comparison"}
+            </button>
+
+            <div className="space-y-2.5 rounded-xl border border-line bg-blue-soft/60 p-4">
               <p className="flex items-center gap-2.5 text-xs text-muted">
-                <Truck size={15} className="shrink-0 text-navy" aria-hidden="true" />
-                Free next-day delivery — order before 4pm
+                <Truck size={15} className="shrink-0 text-blue" aria-hidden="true" />
+                Free express delivery over $499 — next-day on most orders
               </p>
               <p className="flex items-center gap-2.5 text-xs text-muted">
-                <RotateCcw size={15} className="shrink-0 text-navy" aria-hidden="true" />
-                Free 30-day returns, no restocking fee
+                <ShieldCheck size={15} className="shrink-0 text-blue" aria-hidden="true" />
+                24-month NORTH warranty registered at checkout
               </p>
               <p className="flex items-center gap-2.5 text-xs text-muted">
-                <ShieldCheck size={15} className="shrink-0 text-navy" aria-hidden="true" />
-                24-month NORTH warranty included
+                <RotateCcw size={15} className="shrink-0 text-blue" aria-hidden="true" />
+                30-day free returns, no restocking fee
+              </p>
+              <p className="flex items-center gap-2.5 text-xs text-muted">
+                <CreditCard size={15} className="shrink-0 text-blue" aria-hidden="true" />
+                Card, KHQR or cash on delivery
               </p>
             </div>
           </div>
@@ -426,7 +445,7 @@ function ProductDetailsView({ slug }) {
           <div
             role="tablist"
             aria-label="Product information"
-            className="flex gap-7 border-b border-line"
+            className="flex gap-7 overflow-x-auto border-b border-line"
           >
             {[
               { id: "overview", label: "Overview" },
@@ -441,7 +460,7 @@ function ProductDetailsView({ slug }) {
                 aria-selected={tab === entry.id}
                 aria-controls={`panel-${entry.id}`}
                 onClick={() => setTab(entry.id)}
-                className={`tab ${tab === entry.id ? "tab-active" : ""}`}
+                className={`tab shrink-0 ${tab === entry.id ? "tab-active" : ""}`}
               >
                 {entry.label}
               </button>
@@ -457,9 +476,7 @@ function ProductDetailsView({ slug }) {
                 className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]"
               >
                 <div>
-                  <h2 className="font-display text-xl font-semibold text-navy">
-                    In short
-                  </h2>
+                  <h2 className="font-display text-xl font-semibold text-navy">In short</h2>
                   <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
                     {product.description}
                   </p>
@@ -480,16 +497,14 @@ function ProductDetailsView({ slug }) {
                   </ul>
                 </div>
 
-                <div className="rounded-xl border border-line bg-ice p-5">
+                <div className="rounded-2xl border border-line bg-ice p-5">
                   <h3 className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-navy">
                     Key specification
                   </h3>
                   <dl className="mt-3 divide-y divide-line">
                     {["display", "processor", "camera", "battery"].map((key) => (
                       <div key={key} className="flex gap-4 py-3">
-                        <dt className="w-20 shrink-0 text-xs text-muted">
-                          {specLabels[key]}
-                        </dt>
+                        <dt className="w-20 shrink-0 text-xs text-muted">{specLabels[key]}</dt>
                         <dd className="text-xs font-medium text-ink">{product.specs[key]}</dd>
                       </div>
                     ))}
@@ -525,7 +540,7 @@ function ProductDetailsView({ slug }) {
                 aria-labelledby="tab-reviews"
                 className="grid gap-8 lg:grid-cols-[280px_1fr]"
               >
-                <div className="self-start rounded-xl border border-line bg-ice p-5">
+                <div className="self-start rounded-2xl border border-line bg-ice p-5">
                   <p className="font-display text-4xl font-bold text-navy">
                     {product.rating.toFixed(1)}
                   </p>
@@ -555,11 +570,11 @@ function ProductDetailsView({ slug }) {
                   {reviews.map((review) => (
                     <article
                       key={`${review.name}-${review.title}`}
-                      className="rounded-xl border border-line bg-white p-5"
+                      className="rounded-2xl border border-line bg-white p-5"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-3">
-                          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-ice text-[10px] font-semibold text-ink">
+                          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-navy to-blue text-[10px] font-semibold text-white">
                             {review.name
                               .split(" ")
                               .map((part) => part[0])
@@ -597,8 +612,11 @@ function ProductDetailsView({ slug }) {
       <div className="wrap py-12 sm:py-16">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="eyebrow text-blue">You might also like</p>
-            <h2 className="type-section mt-2 text-navy">Related devices</h2>
+            <p className="eyebrow flex items-center gap-2 text-muted">
+              <span className="h-1.5 w-1.5 rounded-[2px] bg-orange" aria-hidden="true" />
+              You might also like
+            </p>
+            <h2 className="type-section mt-2.5 text-navy">Related products</h2>
           </div>
           <Link to="/products" className="text-link">
             Browse everything

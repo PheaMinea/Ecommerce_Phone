@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Check,
   ChevronRight,
@@ -29,9 +29,9 @@ const tabs = [
 ];
 
 const statusStyles = {
-  Processing: "bg-amber/10 text-amber",
+  Processing: "bg-orange/10 text-orange-ink",
   "In transit": "bg-blue/10 text-blue",
-  Delivered: "bg-ink/5 text-ink",
+  Delivered: "bg-mint/10 text-mint",
 };
 
 const formatDate = (value, options) =>
@@ -39,6 +39,24 @@ const formatDate = (value, options) =>
     "en-GB",
     options || { day: "numeric", month: "short", year: "numeric" }
   );
+
+const preferenceKeyFor = (email) =>
+  `north_profile_preferences_v1_${encodeURIComponent(email.toLowerCase())}`;
+
+const readNotificationPreferences = (email) => {
+  if (!email) return {};
+  try {
+    const saved = JSON.parse(localStorage.getItem(preferenceKeyFor(email)) || "null");
+    if (!saved || typeof saved !== "object") return {};
+    return {
+      orderUpdates: typeof saved.orderUpdates === "boolean" ? saved.orderUpdates : true,
+      priceDrops: typeof saved.priceDrops === "boolean" ? saved.priceDrops : true,
+      newsletter: typeof saved.newsletter === "boolean" ? saved.newsletter : false,
+    };
+  } catch {
+    return {};
+  }
+};
 
 const initialsOf = (name = "") =>
   name
@@ -48,7 +66,7 @@ const initialsOf = (name = "") =>
     .join("")
     .toUpperCase();
 
-export default function Profile() {
+export default function Profile({ initialTab = "overview" }) {
   const { user, logout, updateProfile } = useAuth();
   const {
     orders,
@@ -60,19 +78,37 @@ export default function Profile() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const requestedTab = searchParams.get("tab") || "overview";
+  const requestedTab = searchParams.get("tab") || initialTab || "overview";
   const tab = tabs.some((entry) => entry.id === requestedTab) ? requestedTab : "overview";
+  const preferenceKey = user?.email ? preferenceKeyFor(user.email) : null;
 
   const [selectedOrderId, setSelectedOrderId] = useState(orders[0]?.id || "");
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState(() => ({
     name: user?.name || "",
     email: user?.email || "",
     phone: user?.phone || "",
     orderUpdates: true,
     priceDrops: true,
     newsletter: false,
-  });
+    ...readNotificationPreferences(user?.email),
+  }));
   const [settingsErrors, setSettingsErrors] = useState({});
+
+  useEffect(() => {
+    if (!preferenceKey) return;
+    try {
+      localStorage.setItem(
+        preferenceKey,
+        JSON.stringify({
+          orderUpdates: settings.orderUpdates,
+          priceDrops: settings.priceDrops,
+          newsletter: settings.newsletter,
+        })
+      );
+    } catch {
+      /* Keep notification preferences in memory when storage is unavailable. */
+    }
+  }, [preferenceKey, settings.orderUpdates, settings.priceDrops, settings.newsletter]);
 
   const savedProducts = useMemo(
     () => wishlist.map((id) => getProductById(id)).filter(Boolean),
@@ -170,7 +206,7 @@ export default function Profile() {
       </nav>
 
       <div className="mt-4 flex flex-wrap items-center gap-4">
-        <span className="flex h-14 w-14 items-center justify-center rounded-xl border border-line bg-ice text-lg font-bold text-ink">
+        <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-navy to-blue text-lg font-bold text-white">
           {initialsOf(user.name)}
         </span>
         <div>
@@ -185,7 +221,7 @@ export default function Profile() {
 
       <div className="mt-7 grid items-start gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8">
         {/* Sidebar */}
-        <aside>
+        <aside className="min-w-0">
           <nav
             aria-label="Account sections"
             className="no-scrollbar flex gap-2 overflow-x-auto rounded-xl border border-line bg-white p-2 lg:flex-col lg:gap-1"
@@ -227,13 +263,13 @@ export default function Profile() {
           </button>
         </aside>
 
-        <div>
+        <div className="min-w-0">
           {tab === "overview" && (
             <div className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-3">
                 {[
                   { label: "Orders placed", value: orders.length },
-                  { label: "Saved devices", value: savedProducts.length },
+                  { label: "Saved phones", value: savedProducts.length },
                   { label: "Lifetime spend", value: formatPrice(totalSpent) },
                 ].map((stat) => (
                   <div key={stat.label} className="rounded-xl border border-line bg-white p-5">
@@ -363,7 +399,7 @@ export default function Profile() {
                   copy="When you place an order, it will appear here with tracking and receipts."
                   action={
                     <Link to="/products" className="btn-primary">
-                      Browse devices
+                      Browse phones
                     </Link>
                   }
                 />
@@ -478,7 +514,7 @@ export default function Profile() {
                   copy="Once an order is placed, its delivery timeline will live here."
                   action={
                     <Link to="/products" className="btn-primary">
-                      Browse devices
+                      Browse phones
                     </Link>
                   }
                 />
@@ -583,11 +619,11 @@ export default function Profile() {
                 </>
               ) : (
                 <EmptyPanel
-                  title="No saved devices"
-                  copy="Tap the heart on any device to keep it here while you decide."
+                  title="No saved phones"
+                  copy="Tap the heart on any phone to keep it here while you decide."
                   action={
                     <Link to="/products" className="btn-primary">
-                      Browse devices
+                      Browse phones
                     </Link>
                   }
                 />
@@ -669,6 +705,10 @@ export default function Profile() {
 
               <section className="rounded-xl border border-line bg-white p-5 sm:p-6">
                 <h2 className="font-display text-lg font-semibold text-navy">Notifications</h2>
+                <p className="mt-1 text-xs text-muted">
+                  Preferences are saved on this device. Email notifications require a connected
+                  service.
+                </p>
                 <div className="mt-4 space-y-3">
                   {[
                     {
@@ -678,7 +718,7 @@ export default function Profile() {
                     },
                     {
                       key: "priceDrops",
-                      title: "Price drops on saved devices",
+                      title: "Price drops on saved phones",
                       copy: "Only when something on your saved list is reduced.",
                     },
                     {

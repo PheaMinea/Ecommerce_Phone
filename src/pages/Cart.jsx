@@ -17,7 +17,7 @@ import QuantityStepper from "../components/QuantityStepper";
 import { formatPrice } from "../data/products";
 import { useCart } from "../context/CartContext";
 
-const FREE_SHIPPING = 999;
+const FREE_SHIPPING = 499;
 
 export default function Cart() {
   const {
@@ -50,21 +50,21 @@ export default function Cart() {
     return (
       <div className="wrap py-16 sm:py-24">
         <div className="mx-auto flex max-w-lg flex-col items-center text-center">
-          <span className="flex h-16 w-16 items-center justify-center rounded-xl bg-white text-navy shadow-sm ring-1 ring-line">
+          <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-navy shadow-sm ring-1 ring-line">
             <ShoppingBag size={26} aria-hidden="true" />
           </span>
-          <h1 className="type-section mt-5 text-navy">Your bag is empty</h1>
+          <h1 className="type-section mt-5 text-navy">Your cart is empty</h1>
           <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted">
-            Nothing here yet. The catalog is short on purpose — five brands, current
+            Nothing here yet. The catalog is short on purpose — six brands, current
             generation, and a real recommendation for each budget.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link to="/products" className="btn-primary">
-              Browse devices
+              Browse phones
               <ArrowRight size={16} aria-hidden="true" />
             </Link>
             <Link to="/products?deals=1" className="btn-outline">
-              See current offers
+              See promotions
             </Link>
           </div>
         </div>
@@ -82,12 +82,12 @@ export default function Cart() {
           Home
         </Link>
         <ChevronRight size={13} aria-hidden="true" className="text-slate-300" />
-        <span className="text-ink">Bag</span>
+        <span className="text-ink">Cart</span>
       </nav>
 
       <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="type-section text-navy">Your bag</h1>
+          <h1 className="type-section text-navy">Your cart</h1>
           <p className="mt-1 text-sm text-muted">
             {cartCount} {cartCount === 1 ? "item" : "items"} · prices include VAT
           </p>
@@ -100,18 +100,19 @@ export default function Cart() {
 
       <div className="mt-7 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
         <div>
-          <div className="rounded-xl border border-line bg-white px-4 py-3 sm:px-5">
+          <div className="rounded-2xl border border-line bg-white px-4 py-3.5 sm:px-5">
             <div className="flex items-center gap-2.5">
               <Truck size={16} className="shrink-0 text-blue" aria-hidden="true" />
               <p className="text-xs text-muted">
                 {remaining > 0 ? (
                   <>
-                    Add <strong className="font-semibold text-navy">{formatPrice(remaining)}</strong>{" "}
-                    for free next-day delivery.
+                    Add{" "}
+                    <strong className="font-semibold text-navy">{formatPrice(remaining)}</strong>{" "}
+                    more for free express delivery.
                   </>
                 ) : (
                   <strong className="font-semibold text-mint">
-                    Free next-day delivery unlocked.
+                    Free express delivery unlocked.
                   </strong>
                 )}
               </p>
@@ -126,7 +127,7 @@ export default function Cart() {
             </div>
           </div>
 
-          <ul className="mt-4 divide-y divide-line rounded-xl border border-line bg-white">
+          <ul className="mt-4 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white">
             {cartItems.map((item) => {
               const product = cartItemProduct(item);
               if (!product) return null;
@@ -139,7 +140,13 @@ export default function Cart() {
                       className="plate flex h-28 w-24 shrink-0 items-center justify-center rounded-xl border border-line p-2.5 sm:h-32 sm:w-28"
                       aria-label={`View ${item.name}`}
                     >
-                      <PhoneArt product={product} color={product.colors?.find((color) => color.name === item.color)?.hex} className="h-full" />
+                      <PhoneArt
+                        product={product}
+                        color={
+                          product.colors?.find((color) => color.name === item.color)?.hex
+                        }
+                        className="h-full"
+                      />
                     </Link>
 
                     <div className="flex min-w-0 flex-1 flex-col">
@@ -163,8 +170,8 @@ export default function Cart() {
                         <button
                           type="button"
                           onClick={() => removeFromCart(item.key)}
-                          aria-label={`Remove ${item.name} from bag`}
-                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-sale/5 hover:text-sale"
+                          aria-label={`Remove ${item.name} from cart`}
+                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-orange-soft hover:text-orange-ink"
                         >
                           <Trash2 size={16} aria-hidden="true" />
                         </button>
@@ -197,7 +204,7 @@ export default function Cart() {
           <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted">
             <span className="flex items-center gap-1.5">
               <ShieldCheck size={14} className="text-mint" aria-hidden="true" />
-              24-month warranty on every device
+              24-month official warranty
             </span>
             <span className="flex items-center gap-1.5">
               <Truck size={14} className="text-mint" aria-hidden="true" />
@@ -207,7 +214,7 @@ export default function Cart() {
         </div>
 
         {/* Summary */}
-        <aside className="rounded-xl border border-line bg-white p-5 lg:sticky lg:top-[88px]">
+        <aside className="rounded-2xl border border-line bg-white p-5 lg:sticky lg:top-[92px]">
           <h2 className="font-display text-lg font-semibold text-navy">Order summary</h2>
 
           <form onSubmit={submitCoupon} className="mt-4" noValidate>
@@ -216,7 +223,7 @@ export default function Cart() {
               Promotion code
             </label>
             {coupon ? (
-              <div className="flex items-center justify-between rounded-lg border border-mint/30 bg-mint/5 px-3 py-2.5">
+              <div className="flex items-center justify-between rounded-xl border border-mint/30 bg-mint/5 px-3 py-2.5">
                 <span className="flex items-center gap-2 text-xs font-semibold text-mint">
                   <Tag size={13} aria-hidden="true" />
                   {coupon.code} · {coupon.percent}% off
@@ -252,7 +259,7 @@ export default function Cart() {
                   </button>
                 </div>
                 {couponError && (
-                  <p id="promo-error" className="mt-1.5 text-xs font-medium text-sale">
+                  <p id="promo-error" className="mt-1.5 text-xs font-medium text-orange-ink">
                     {couponError}
                   </p>
                 )}
@@ -272,19 +279,21 @@ export default function Cart() {
               </div>
             )}
             <div className="flex items-center justify-between">
-              <dt className="text-muted">Shipping</dt>
+              <dt className="text-muted">Delivery</dt>
               <dd className="font-medium text-ink">
                 {totals.shipping === 0 ? "Free" : formatPrice(totals.shipping)}
               </dd>
             </div>
             <div className="flex items-center justify-between border-t border-line pt-3 text-base">
               <dt className="font-semibold text-navy">Total</dt>
-              <dd className="font-display text-xl font-bold text-navy">{formatPrice(totals.total)}</dd>
+              <dd className="font-display text-xl font-bold text-navy">
+                {formatPrice(totals.total)}
+              </dd>
             </div>
           </dl>
 
           {totals.savings > 0 && (
-            <p className="mt-2 rounded-lg bg-sale/5 px-3 py-2 text-xs font-medium text-sale">
+            <p className="mt-2 rounded-lg bg-orange-soft px-3 py-2 text-xs font-medium text-orange-ink">
               You're saving {formatPrice(totals.savings)} on this order.
             </p>
           )}
@@ -307,7 +316,7 @@ export default function Cart() {
               Secure checkout · 256-bit encryption
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {["VISA", "MASTERCARD", "AMEX", "APPLE PAY"].map((method) => (
+              {["VISA", "MASTERCARD", "KHQR", "COD"].map((method) => (
                 <span
                   key={method}
                   className="rounded border border-line px-1.5 py-1 font-mono text-[8px] tracking-[0.08em] text-muted"

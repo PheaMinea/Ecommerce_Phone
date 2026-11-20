@@ -1,86 +1,140 @@
-import React from "react";
-import { ArrowRight, Check, ShieldCheck, Truck } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import PhoneArt from "./PhoneArt";
-import { getProductBySlug, formatPrice } from "../data/products";
+import { getProductBySlug } from "../data/products";
 
-const specRail = [
-  { label: "Chip", value: "A19 Pro" },
-  { label: "Display", value: '6.9" · 120Hz' },
-  { label: "Cameras", value: "48MP × 3" },
-  { label: "Battery", value: "39 hours video" },
+const slides = [
+  {
+    slug: "iphone-17-pro-max",
+    banner: "/iphone-17-pro-max-banner.png",
+    imageAlt: "iPhone 17 Pro Max new arrival. Shop now.",
+  },
+  {
+    slug: "iphone-17-pro",
+    banner: "/iphone-17-pro-banner-midnight.png",
+    imageWidth: "1095",
+    imageHeight: "768",
+    imageAlt: "Deep blue iPhone Pro shown from the front and back",
+    headline: "iPhone 17 Pro",
+    caption: "Pro performance, in every detail.",
+    cta: "Shop iPhone 17 Pro",
+  },
+  {
+    slug: "iphone-17-pro",
+    banner: "/iphone-17-pro-banner-silver.png",
+    imageWidth: "1365",
+    imageHeight: "768",
+    imageAlt: "Silver iPhone Pro displayed in a studio setting",
+    headline: "A brighter kind of Pro.",
+    caption: "Meet the iPhone 17 Pro in silver.",
+    cta: "Explore iPhone",
+    copyPlacement: "top",
+  },
 ];
 
 export default function Hero() {
-  const hero = getProductBySlug("iphone-17-pro-max");
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const slide = slides[activeIndex];
+  const product = getProductBySlug(slide.slug);
+
+  const slideControls = slides.map((entry, index) => (
+    <button
+      key={`${entry.slug}-${index}`}
+      type="button"
+      onClick={() => setActiveIndex(index)}
+      aria-label={`Show ${entry.headline || getProductBySlug(entry.slug).name}`}
+      aria-current={index === activeIndex ? "true" : undefined}
+      className="flex h-8 w-8 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563eb]"
+    >
+      <span
+        className={`h-1.5 rounded-full transition-all ${
+          index === activeIndex ? "w-5 bg-[#2563eb]" : "w-1.5 bg-[#2563eb]/35"
+        }`}
+      />
+    </button>
+  ));
+
+  useEffect(() => {
+    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+
+    const timer = window.setInterval(() => {
+      setActiveIndex((current) => (current + 1) % slides.length);
+    }, 5000);
+
+    return () => window.clearInterval(timer);
+  }, [paused]);
 
   return (
-    <section className="border-b border-line bg-[#f3f4f6]">
-      <div className="wrap py-12 sm:py-16">
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.14em] text-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue" aria-hidden="true" />
-              New arrival · iPhone 17 Pro Max
-            </p>
-
-            <h1 className="type-hero mt-4 max-w-xl text-ink">
-              Titanium,
-              <br />
-              re-engineered.
-            </h1>
-
-            <p className="mt-5 max-w-lg text-base leading-relaxed text-muted">
-              A19 Pro. A 4x tetraprism telephoto. 39 hours of video. The most capable
-              iPhone we have ever stocked — available for next-day delivery.
-            </p>
-
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Link to={`/product/${hero.slug}`} className="btn-primary">
-                Shop Now
-                <ArrowRight size={16} aria-hidden="true" />
-              </Link>
-              <Link to="/products" className="btn-outline">
-                Explore More
-              </Link>
-            </div>
-
-            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted">
-              <span className="flex items-center gap-1.5">
-                <Truck size={14} className="text-blue" aria-hidden="true" />
-                Free next-day delivery
+    <section
+      className="relative isolate overflow-hidden bg-[#eff6ff]"
+      aria-label="Featured phones"
+      aria-roledescription="carousel"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false);
+      }}
+    >
+      <div className="relative mx-auto max-w-[1800px]">
+        {slide.headline ? (
+          <Link
+            to={`/product/${product.slug}`}
+            aria-label={`Shop ${product.name}`}
+            className="relative block aspect-[16/9] overflow-hidden bg-[#f3f5f9] focus-visible:outline-[#2563eb]"
+          >
+            <img
+              src={slide.banner}
+              alt={slide.imageAlt}
+              width={slide.imageWidth}
+              height={slide.imageHeight}
+              className="absolute inset-0 h-full w-full object-contain"
+            />
+            <span
+              className={`absolute left-[4%] z-10 flex flex-col sm:left-[5%] md:left-[6%] ${
+                slide.copyPlacement === "top"
+                  ? "top-[5%] w-[34%] sm:inset-y-0 sm:top-auto sm:w-[38%] sm:justify-center md:w-[34%]"
+                  : "inset-y-0 w-[52%] justify-center sm:w-[44%] md:w-[38%]"
+              }`}
+            >
+              <span className="font-display text-[clamp(1rem,3.8vw,3rem)] font-bold leading-tight tracking-tight text-[#111827]">
+                {slide.headline}
               </span>
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck size={14} className="text-blue" aria-hidden="true" />
-                24-month warranty
+              <span className="mt-1.5 text-[clamp(0.65rem,1.3vw,1.125rem)] font-medium text-[#475569] sm:mt-3">
+                {slide.caption}
               </span>
-              <span className="flex items-center gap-1.5">
-                <Check size={14} className="text-blue" aria-hidden="true" />
-                30-day returns
+              <span className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#2563eb] px-3 py-1.5 text-[10px] font-semibold text-white transition-colors hover:bg-[#1d4ed8] sm:mt-5 sm:px-5 sm:py-2.5 sm:text-sm">
+                {slide.cta}
+                <ArrowRight size={14} aria-hidden="true" />
               </span>
-            </div>
-          </div>
-
-          <div className="relative flex h-[360px] items-center justify-center rounded-2xl border border-line bg-white p-6 sm:h-[470px] sm:p-10">
-            <div className="h-[90%]">
-              <PhoneArt product={hero} className="h-full" />
-            </div>
-            <p className="absolute bottom-4 left-5 text-xs text-muted">
-              iPhone 17 Pro Max · From {formatPrice(hero.price)}
-            </p>
+            </span>
+          </Link>
+        ) : (
+          <Link
+            to={`/product/${product.slug}`}
+            aria-label={`Shop ${product.name}`}
+            className="block aspect-[16/9] overflow-hidden bg-[#f3f5f9] focus-visible:outline-[#2563eb]"
+          >
+            <img
+              src={slide.banner}
+              alt={slide.imageAlt}
+              width="1800"
+              height="768"
+              fetchPriority="high"
+              className="h-full w-full object-contain"
+            />
+          </Link>
+        )}
+        <div
+          className={`absolute inset-x-0 z-10 flex justify-center ${
+            slide.headline ? "bottom-2 sm:bottom-4" : "bottom-[12%]"
+          }`}
+        >
+          <div className="flex rounded-full bg-white/80 px-1 backdrop-blur-sm">
+            {slideControls}
           </div>
         </div>
-
-        <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-6 border-t border-line pt-8 md:grid-cols-4">
-          {specRail.map((spec) => (
-            <div key={spec.label}>
-              <dt className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted">
-                {spec.label}
-              </dt>
-              <dd className="mt-1.5 text-sm font-semibold text-ink">{spec.value}</dd>
-            </div>
-          ))}
-        </dl>
       </div>
     </section>
   );
